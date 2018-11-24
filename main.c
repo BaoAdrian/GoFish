@@ -17,30 +17,23 @@ const int SUIT_LENGTH = 10;
 typedef struct card_s {
     char suit[SUIT_LENGTH];
     int value;
-    // struct card_s *prev;
-    struct card_s *next; // Pointer to the next card in the LinkedList
+    struct card_s *prev;
+    struct card_s *next;
 } card;
 
 struct card_s* pull_card_data(char line[]);
 void print_list(struct card_s *card);
 void create_list(struct card_s *card); // Function used to create the deck of cards to be used as the pool
-void add_to_end(struct card_s *head, struct card_s *tail, struct card_s *card); // Add card to end of list
+void add_to_end(struct card_s *p, struct card_s **hl, struct card_s **hr, char line[]); // Add card to end of list
 
 int main(void) {
     
     /* Variable Declarations */
     char line[LINE_SIZE];
-    struct card_s *temp_card = NULL;
-    temp_card = (struct card_s*)malloc(sizeof(struct card_s));
-    
     
     // Declare head and tail pointer to keep track of each end of the list
-    struct card_s *head = NULL;
-    struct card_s *tail = NULL;
-    
-    // Dynamically allocate memory for head and tail
-    head = (struct card_s*)malloc(sizeof(struct card_s));
-    tail = (struct card_s*)malloc(sizeof(struct card_s));
+    struct card_s *hl = NULL;
+    struct card_s *hr = NULL;
     
     // Input file that may be used to read in the formatted output to populate linkedlist
     FILE *inp;
@@ -53,21 +46,14 @@ int main(void) {
     
     
     while (fgets(line, LINE_SIZE, inp) != NULL) {
-        
-        temp_card = pull_card_data(line);
-        
-        add_to_end(head, tail, temp_card);
-        
-        printf("[%d : %s] -> ", temp_card->value, temp_card->suit);
-
-        temp_card = NULL; // Clear out the pointer to process next value
+        add_to_end(hr, &hl, &hr, line);
     }
     
     printf("\n===================================\n");
     
     
     
-    // print_list(head);
+    print_list(hl);
     
     
     return 0;
@@ -77,8 +63,7 @@ struct card_s* pull_card_data(char line[]) {
     
     char *temp;
     int i;
-    struct card_s *temp_card;
-    temp_card = (struct card_s*)malloc(sizeof(struct card_s));
+    struct card_s *temp_card = (struct card_s*)malloc(sizeof(struct card_s));
     
     // Remove trailing new line when reading from file
     line[strlen(line) - 1] = '\0';
@@ -107,6 +92,8 @@ struct card_s* pull_card_data(char line[]) {
         i++;
     }
     
+    temp_card->suit[i] = '\0'; // terminate the string
+    
     
     
     return temp_card;
@@ -114,26 +101,36 @@ struct card_s* pull_card_data(char line[]) {
 }
 
 
-void print_list(struct card_s *card) {
-    
-    while (card != NULL) {
-        printf("[%d : %s] -> ", card->value, card->suit);
-        card = card->next;
+void print_list(struct card_s *p) {
+    struct card_s *curr = p;
+    while (curr != NULL) {
+        printf("[%d : %s] -> ", curr->value, curr->suit);
+        curr = curr->next;
     }
 }
 
-void add_to_end(struct card_s *head, struct card_s *tail, struct card_s *temp_card) {
+void add_to_end(struct card_s *p, struct card_s **hl, struct card_s **hr, char line[]) {
     
-    if (head == NULL) {
-        // List is empty, add to the front
-        head = temp_card;
-        tail = temp_card;
+    struct card_s *temp_card = (struct card_s*)malloc(sizeof(struct card_s));
+    
+    temp_card = pull_card_data(line);
+    printf("[%d : %s] -> ", temp_card->value, temp_card->suit);
+    
+    if (*hl == NULL) {
+        // List is empty
+        *hl = temp_card;
+        *hr = temp_card;
         temp_card->next = NULL;
-    } else {
-        // Add to end, whatever tail is pointing to
-        tail->next = temp_card;
+        temp_card->prev = NULL;
+    } else if (p->next == NULL) {
+        p->next = temp_card;
+        temp_card->prev = p;
         temp_card->next = NULL;
-        tail = temp_card;
+        *hr = temp_card;
     }
+    
+    temp_card = NULL; // Clears buffer for suit (removes any characters remaining inside)
+    
+    
     
 }
