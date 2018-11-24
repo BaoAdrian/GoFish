@@ -12,4 +12,6 @@ Final Project for ECE175
 - First program uploaded includes doubly-linked list creation by using double pointers.
 - Second program uploaded includes how to swap values from two nodes with given indices. We can use this method to shuffle the deck of cards
 </li>
+
+<li> 11/24/2018 - Implement structure of Double-Linked List. Uses double pointers to populate the LinkedList by parsing a given file and adding each Card structure to the LinkedList. </li>
 </ul>
