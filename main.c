@@ -29,6 +29,7 @@ void add_to_end(card *p, card **hl, card **hr, char line[]); // Add card to end 
 card* pull_card_data(char line[]);
 int find_length(card *hl);
 void print_list(card *card);
+void print_formatted_list(card *card); // Prints unicode characters instead of words
 void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
 int rand_gen(int count);
 
@@ -60,16 +61,17 @@ int main(void) {
         add_to_end(hr, &hl, &hr, line);
     }
     
-    printf("\n===================================\n");
+    
     
     // At this point, list is fully populated with length of 52
     int num_cards = find_length(hl);
     
     // Print before swap
-    print_list(hl);
+    printf("BEFORE SHUFFLING: \n");
+    print_formatted_list(hl);
     
     // Perform 100 swaps
-    int num_swaps = 3;
+    int num_swaps = 100;
     int idx_1, idx_2;
     for (int i = 0; i < num_swaps; i++) {
         idx_1 = rand_gen(num_cards);
@@ -84,10 +86,10 @@ int main(void) {
     }
     
     
-    printf("\n===================================\n");
+    printf("\n\nAFTER SHUFFLING: \n");
     
     // Print after swapping first two values
-    print_list(hl);
+    print_formatted_list(hl);
     
     return 0;
 }
@@ -157,12 +159,27 @@ void print_list(card *p) {
     }
 }
 
+void print_formatted_list(card *p) {
+    card *curr = p;
+    while (curr != NULL) {
+        if (strcmp(curr->suit, "hearts") == 0) {
+            printf("[%d : \u2665] -> ", curr->value);
+        } else if (strcmp(curr->suit, "diamonds") == 0){
+            printf("[%d : \u2666] -> ", curr->value);
+        } else if (strcmp(curr->suit, "spades") == 0){
+            printf("[%d : \u2660] -> ", curr->value);
+        } else if (strcmp(curr->suit, "clubs") == 0){
+            printf("[%d : \u2663] -> ", curr->value);
+        }
+        curr = curr->next;
+    }
+}
+
 void add_to_end(card *p, card **hl, card **hr, char line[]) {
     
     card *temp_card = (card*)malloc(sizeof(card));
     
     temp_card = pull_card_data(line);
-    printf("[%d : %s] -> ", temp_card->value, temp_card->suit);
     
     if (*hl == NULL) {
         // List is empty
