@@ -21,10 +21,10 @@ typedef struct card_s {
     struct card_s *next;
 } card;
 
-struct card_s* pull_card_data(char line[]);
-void print_list(struct card_s *card);
-void create_list(struct card_s *card); // Function used to create the deck of cards to be used as the pool
-void add_to_end(struct card_s *p, struct card_s **hl, struct card_s **hr, char line[]); // Add card to end of list
+card* pull_card_data(char line[]);
+void print_list(card *card);
+void create_list(card *card); // Function used to create the deck of cards to be used as the pool
+void add_to_end(card *p, card **hl, card **hr, char line[]); // Add card to end of list
 
 int main(void) {
     
@@ -32,8 +32,8 @@ int main(void) {
     char line[LINE_SIZE];
     
     // Declare head and tail pointer to keep track of each end of the list
-    struct card_s *hl = NULL;
-    struct card_s *hr = NULL;
+    card *hl = NULL;
+    card *hr = NULL;
     
     // Input file that may be used to read in the formatted output to populate linkedlist
     FILE *inp;
@@ -59,11 +59,11 @@ int main(void) {
     return 0;
 }
 
-struct card_s* pull_card_data(char line[]) {
+card* pull_card_data(char line[]) {
     
     char *temp;
     int i;
-    struct card_s *temp_card = (struct card_s*)malloc(sizeof(struct card_s));
+    card *temp_card = (card*)malloc(sizeof(card));
     
     // Remove trailing new line when reading from file
     line[strlen(line) - 1] = '\0';
@@ -101,17 +101,17 @@ struct card_s* pull_card_data(char line[]) {
 }
 
 
-void print_list(struct card_s *p) {
-    struct card_s *curr = p;
+void print_list(card *p) {
+    card *curr = p;
     while (curr != NULL) {
         printf("[%d : %s] -> ", curr->value, curr->suit);
         curr = curr->next;
     }
 }
 
-void add_to_end(struct card_s *p, struct card_s **hl, struct card_s **hr, char line[]) {
+void add_to_end(card *p, card **hl, card **hr, char line[]) {
     
-    struct card_s *temp_card = (struct card_s*)malloc(sizeof(struct card_s));
+    card *temp_card = (card*)malloc(sizeof(card));
     
     temp_card = pull_card_data(line);
     printf("[%d : %s] -> ", temp_card->value, temp_card->suit);
