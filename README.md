@@ -9,6 +9,7 @@ Final Project for ECE175
   
   <li> 11/24/2018 - Create Reference Programs folder to include various different programs to reference certain methods and function used to implement the final project structure.
   
-- First upload includes doubly-linked list creation by using double pointers.
+- First program uploaded includes doubly-linked list creation by using double pointers.
+- Second program uploaded includes how to swap values from two nodes with given indices. We can use this method to shuffle the deck of cards
 </li>
 </ul>
