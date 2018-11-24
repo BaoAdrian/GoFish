@@ -2,6 +2,6 @@ This folder contains various programs that may be referenced to understand the p
 
 <ul>
   
-  <li> hw9p1.c - Homework problem that showcases the creating of a doubly-linked list with the use of double pointers. </li>
+  <li> hw9p1.c - Shows how to create a doubly-linked list with the use of double pointers. </li>
 
 </ul>
