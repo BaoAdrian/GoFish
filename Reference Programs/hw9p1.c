@@ -38,6 +38,7 @@ int main(void) {
     
     // Loop through creating linked list until user decides to stop
     while (response == 'y') {
+        // Pass in pointer to the last value as well as address to headRight and headLeft
         addMember(hr, &hl, &hr);
         printf("Do you want to enter another integer (y/n)?");
         scanf("%*c%c", &response);
