@@ -7,8 +7,10 @@
 //
 
 #include <stdio.h>
-#include <string.h>
+#include <string.h> // string functions
 #include <stdlib.h>
+#include <math.h> // Random number generator for shuffling
+#include <time.h> // Used to seed the random number generator
 
 const int LINE_SIZE = 15;
 const int SUIT_LENGTH = 10;
@@ -21,12 +23,21 @@ typedef struct card_s {
     struct card_s *next;
 } card;
 
-card* pull_card_data(char line[]);
-void print_list(card *card);
+/* Function Prototypes */
 void create_list(card *card); // Function used to create the deck of cards to be used as the pool
 void add_to_end(card *p, card **hl, card **hr, char line[]); // Add card to end of list
+card* pull_card_data(char line[]);
+int find_length(card *hl);
+void print_list(card *card);
+void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
+int rand_gen(int count);
+
+
 
 int main(void) {
+    
+    // Seed the RNG
+    srand((int)time(NULL));
     
     /* Variable Declarations */
     char line[LINE_SIZE];
@@ -51,10 +62,32 @@ int main(void) {
     
     printf("\n===================================\n");
     
+    // At this point, list is fully populated with length of 52
+    int num_cards = find_length(hl);
     
-    
+    // Print before swap
     print_list(hl);
     
+    // Perform 100 swaps
+    int num_swaps = 3;
+    int idx_1, idx_2;
+    for (int i = 0; i < num_swaps; i++) {
+        idx_1 = rand_gen(num_cards);
+        idx_2 = rand_gen(num_cards);
+        
+        // Need to ensure that we don't swap a card with itself
+        while (idx_2 == idx_1) {
+            // Grab another random index
+            idx_2 = rand_gen(num_cards);
+        }
+        swap(hl, idx_1, idx_2);
+    }
+    
+    
+    printf("\n===================================\n");
+    
+    // Print after swapping first two values
+    print_list(hl);
     
     return 0;
 }
@@ -100,6 +133,21 @@ card* pull_card_data(char line[]) {
     
 }
 
+int find_length(card *hl) {
+    
+    int length = 0;
+    
+    card *curr = (card*)malloc(sizeof(card));
+    curr = hl;
+    
+    while (curr != NULL) {
+        length++;
+        curr = curr->next;
+    }
+    
+    return length;
+}
+
 
 void print_list(card *p) {
     card *curr = p;
@@ -133,4 +181,65 @@ void add_to_end(card *p, card **hl, card **hr, char line[]) {
     
     
     
+}
+
+
+/************************************************************************
+ * swap(): Function that accepts the two target indices and the pointer *
+ *      to the head of the LinkedList. Traverses the list pulling the   *
+ *      nodes at the given indices (i, j) then performs a swap of the   *
+ *      value and suit of the card, essentially swapping cards          *
+ ************************************************************************/
+void swap(card *pt, int i, int j) {
+    
+    card *temp = pt;
+    card *node_1 = NULL;
+    card *node_2 = NULL;
+    int flag;
+    
+    // Pull Node 1
+    flag = 0; // start at beginning of list
+    while (flag < i) {
+        temp = temp->next;
+        flag++;
+    }
+    node_1 = temp;
+    
+    // Reset and Pull Node 2
+    temp = pt;
+    flag = 0;
+    
+    while (flag < j) {
+        temp = temp->next;
+        flag++;
+    }
+    node_2 = temp;
+    
+    // Temporary values
+    int temp_value;
+    char temp_suit[SUIT_LENGTH];
+    
+    temp_value = node_1->value;
+    strcpy(temp_suit, node_1->suit);
+    
+    node_1->value = node_2->value;
+    //node_1->suit[0] = '\0';
+    strcpy(node_1->suit, node_2->suit);
+    
+    node_2->value = temp_value;
+    //node_2->suit[0] = '\0';
+    strcpy(node_2->suit, temp_suit);
+    
+}
+
+
+/************************************************************************
+ * rand_gen(): Function that generates a random number from 0 to length *
+ *      of the LinkedList in order to pull two indices to swap their    *
+ *      values (i.e. their value and suit of card)                      *
+ ************************************************************************/
+int rand_gen(int count) {
+    double frac;
+    frac = (double)rand()/((double)RAND_MAX+1);
+    return floor(count*frac);
 }
