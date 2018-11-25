@@ -98,19 +98,23 @@ if (*hl == NULL) {
 ```
 
 The process of executing the above mentioned code is as follows:
-
 <img src = "Project_Images/LinkedList_Add_to_Empty.png" width = "700" height = "900" hspace = "10" alt="add to empty list">
 </p>
 <br>
 <p> The second case that is handled when adding to the list is when there is already Card Objects in the list, i.e. <strong>head-left is NOT NULL</strong>. When head-left is checked and found that it is pointing to a Card, then we must adjust the necessary pointers as before only this time, we need to ensure the <strong>prev</strong> attribute is adjusted. Note that <strong>p</strong> here is the Card that <strong>hr</strong> (head-right) is pointing to as stated in the function call. When <strong>p->next</strong> is NULL, that means it is the last element in the list and that is where the current Card should be inserted.
   
   ```C
-  else if (p->next == NULL) {
+  if (*hl == NULL) {
+      // Broken down above
+  } else if (p->next == NULL) {
       p->next = temp_card;
       temp_card->prev = p;
       temp_card->next = NULL;
       *hr = temp_card;
   }
   ```
+
+The process of executing the above mentioned code is as follows:
+<img src = "Project_Images/LinkedList_Add_to_End.png" width = "700" height = "900" hspace = "10" alt="add to empty list">
 
 </p>
