@@ -17,6 +17,12 @@ Final Project for ECE175
 <li> 11/24/2018 - Implement shuffling structure of the main deck of cards upon initial start of the game. Currently set to 100 swaps to shuffle the deck. Will swap the value and suit of the card to avoid restructuring the entire linked list.
 
 - Output also formatted to display the unicode character instead of the word. Will be replaced in the future with actual card designs.</li>
+<li> 11/24/2018 - Finalize deck construction (Doubly-Linked List) and Shuffling method. Current implementation supports both requests from specs which allows the user to do either of the following:
+  
+  [X] (0) Program generates a shuffled deck for the user and displays onto the console.
+  
+  [X] (1) User provides a pre-formatted file that will be read and parsed to generate a deck from the contents of the file.
+</li>
 </ul>
 
 <h1> Construction Documentation </h1>
