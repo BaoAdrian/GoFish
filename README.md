@@ -19,9 +19,8 @@ Final Project for ECE175
 - Output also formatted to display the unicode character instead of the word. Will be replaced in the future with actual card designs.</li>
 <li> 11/24/2018 - Finalize deck construction (Doubly-Linked List) and Shuffling method. Current implementation supports both requests from specs which allows the user to do either of the following:
   
-  [X] (0) Program generates a shuffled deck for the user and displays onto the console.
-  
-  [X] (1) User provides a pre-formatted file that will be read and parsed to generate a deck from the contents of the file.
+  - (0) Program generates a shuffled deck for the user and displays onto the console.
+  - (1) User provides a pre-formatted file that will be read and parsed to generate a deck from the contents of the file.
 </li>
 </ul>
 
