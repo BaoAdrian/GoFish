@@ -34,7 +34,7 @@ Final Project for ECE175
 
 <p> When the user selects this option, the program will read input from a specified file in the following format: 
   
-  ```C
+  ```
   Rank Suit
   Rank Suit
   ...
@@ -53,3 +53,27 @@ Final Project for ECE175
   ```
   
   This allows for ease of processing later in the program when the users are playing the game of GoFish and requesting for a specific suit. Rather than having to search for a specific character, they are order sequentially by values starting from 1 to 13.
+  
+  As each line is processed using a while loop, the line is passed along with references to the <strong>head-left</strong> and <strong>head-right</strong> of the Doubly-Linked List. The function call will look like so:
+  
+  ```C
+  add_to_end(hr, &hl, &hr, line);
+  ```
+  
+  Here, hr is the current Card Object that the pointer, hr (head-right), is pointing to. <strong>&hr and &hl</strong> are the address of the head pointers themselves so that the add_to_head function can make the necessary adjustments after the Card Object has been added to the LinkedList. The receiving parameters of the function look like the following:
+  
+  ```C
+  void add_to_end(card *p, card **hl, card **hr, char line[]) { ... }
+  ```
+
+The return type is void since all changes made to head-left and head-right occur within the function, reassigning pointers when necessary. Two cases are handled within this function. The first is when the list is currently empty, that means that <strong>head-left</strong> does not point to anything, thus is equal to NULL. If check is made for this condition and the result is TRUE, then we must first set the two head pointers (head-left and head-right) to point to the new Card introduced to the LinkedList. The final step once the pointers are set is to set the internal attributes of the Card. Since it was the first Card added to the LinkedList, we need to set the <strong>next</strong> and <strong>prev</strong> attributes to NULL since they will not point to anything yet.
+
+```C
+if (*hl == NULL) {
+     // List is empty
+     *hl = temp_card;
+     hr = temp_card;
+     temp_card->next = NULL;
+     temp_card->prev = NULL;
+} else { ... }
+```
