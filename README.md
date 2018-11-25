@@ -37,10 +37,42 @@ typedef struct card_s {
 
 <br>
 
-<p> The first portion of this program requires the user to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
+<p> The first portion of this program requires the user to choose if they want to a shuffled deck or load a predefined set of cards from a file. The current implementation of the program currently sets the selection based off a binary choice. If the user selects 0, a shuffled deck is generated and displayed. If the user selects 1, a file is read and parsed into a deck and displayed. </p>
 
 <h3> Shuffled Deck Selection </h3>
-<p> Work in progress. When selected, program should loop through a set of arrays holding ranks and suits and automatically create a deck which can then be looped through and shuffled a set number of times to essentially present the users with a shuffled deck. </p>
+
+<p> This option, if selected, will generate a deck of 52 cards using for loops and runs the deck through the shuffler that performs 200 swaps and displays the pre- and post-shuffled decks to the user. The generation is done using two nested for loops, the outer loop controlling the rank (1-13) and the inner loop controlling the suit (hearts, diamonds, clubs, spades). The following snippet shows how the deck is generated. (NOTE: description of the <strong>add_to_head( ... )</strong> function is further below).
+  
+  ```C
+  char suits[4] = {'h', 'd', 'c', 's'}; // Used to iterate through each suit of the deck
+  if (deck_init == 0) {
+        // Construct a standard sequential deck then shuffle it 200 times
+        for (int i = 1; i <= 13; i++) {
+            for (int j = 0; j < 4; j++) {
+                card *temp_card = (card*)malloc(sizeof(card));
+                temp_card->value = i;
+                if (suits[j] == 'h') {
+                    strcpy(temp_card->suit, "hearts");
+                } else if (suits[j] == 'd') {
+                    strcpy(temp_card->suit, "diamonds");
+                } else if (suits[j] == 'c') {
+                    strcpy(temp_card->suit, "clubs");
+                } else if (suits[j] == 's') {
+                    strcpy(temp_card->suit, "spades");
+                }
+                add_to_end(hr, &hl, &hr, temp_card); // Adds temp_card to the list
+            }
+        }
+        
+        ... // Code for shuffling explained below...
+  ```
+  
+  Once the deck is generated, it is then shuffled by swapping two randomly selected cards within the deck. This operation is performed 200 times to ensure a unique shuffled deck. Once the deck is shuffled, the output is then printed as follows: </p>
+
+<img src = "Project_Images/generated_shuffled_deck.png" width = "1100" height="175" hspace="10" alt="generated shuffle deck">
+
+<p> Here, the generated deck is the one created with the for loops. The shuffled deck is the deck after being passed through the shuffling portion of the program. </p>
+
 
 <br>
 
@@ -68,26 +100,23 @@ typedef struct card_s {
   
   This allows for ease of processing later in the program when the users are playing the game of GoFish and requesting for a specific suit. Rather than having to search for a specific character, they are order sequentially by values starting from 1 to 13.
   
-  As each line is processed using a while loop, the line is passed along with references to the <strong>head-left</strong> and <strong>head-right</strong> of the Doubly-Linked List. The function call will look like so:
+  As each line is processed using a while loop, the temp_card that has been created with the current line read from the file is passed along with references to the <strong>head-left</strong> and <strong>head-right</strong> of the Doubly-Linked List. The function call will look like so:
   
   ```C
-  add_to_end(hr, &hl, &hr, line);
+  add_to_end(hr, &hl, &hr, temp_card);
   ```
   
   Here, hr is the current Card Object that the pointer, hr (head-right), is pointing to. <strong>&hr and &hl</strong> are the address of the head pointers themselves so that the add_to_head function can make the necessary adjustments after the Card Object has been added to the LinkedList. The receiving parameters of the function look like the following:
   
   ```C
-  void add_to_end(card *p, card **hl, card **hr, char line[]) { ... }
+  void add_to_end(card *p, card **hl, card **hr, card *temp_card) { ... }
   ```
 
 The return type is void since all changes made to head-left and head-right occur within the function, reassigning pointers when necessary. As stated before, hl and hr and references to the pointers in main so that we can make adjustments within this function without having to return them both...
 
 Two cases are handled within this function. The first is when the list is currently empty, that means that <strong>head-left</strong> does not point to anything, thus is equal to NULL. If check is made for this condition and the result is TRUE, then we must first set the two head pointers (head-left and head-right) to point to the new Card introduced to the LinkedList. The final step once the pointers are set is to set the internal attributes of the Card. Since it was the first Card added to the LinkedList, we need to set the <strong>next</strong> and <strong>prev</strong> attributes to NULL since they will not point to anything yet.
 
-```C
-card *temp_card = (card*)malloc(sizeof(card));
-temp_card = pull_card_data(line); // Parse data from line
-    
+```C  
 if (*hl == NULL) {
      // List is empty
      *hl = temp_card;
