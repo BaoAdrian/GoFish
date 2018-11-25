@@ -25,14 +25,13 @@ typedef struct card_s {
 
 /* Function Prototypes */
 int get_init_deck(void);
-void create_list(card *card); // Function used to create the deck of cards to be used as the pool
 void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
-card* pull_card_data(char line[]);
+card* pull_card_data(char line[]); // Parse line from file into Card Struct
 int find_length(card *hl);
+int rand_gen(int count);
+void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
-void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
-int rand_gen(int count);
 
 
 
@@ -51,7 +50,6 @@ int main(void) {
     
     // Get user selection: use shuffled deck(0) or use preformatted file input (1)
     deck_init = get_init_deck();
-    
     
     
     if (deck_init == 0) {
@@ -123,6 +121,7 @@ int main(void) {
     return 0;
 }
 
+
 /************************************************************************
  * get_init_deck(): Function that returns the binary choice (0 or 1)    *
  *      that the user selected as the deck generation method.           *
@@ -146,6 +145,35 @@ int get_init_deck(void) {
     return deck_init;
     
 }
+
+
+/************************************************************************
+ * add_to_end(): Function that adds a Card Struct to the end of the     *
+ *      Doubly-Linked List and makes the necessary changes to handle    *
+ *      all cases of Linked List construction.                          *
+ *                                                                      *
+ * Parameters: p - Card Object that head-right is pointing to           *
+ *             hl/hr - Double pointer that allows function to change    *
+ *                  the value of hl/hr without having to return both.   *
+ *             temp_card - Card Object that needs to be added to end.   *
+ ************************************************************************/
+void add_to_end(card *p, card **hl, card **hr, card *temp_card) {
+    
+    if (*hl == NULL) {
+        // List is empty
+        *hl = temp_card;
+        *hr = temp_card;
+        temp_card->next = NULL;
+        temp_card->prev = NULL;
+    } else if (p->next == NULL) {
+        p->next = temp_card;
+        temp_card->prev = p;
+        temp_card->next = NULL;
+        *hr = temp_card;
+    }
+    
+}
+
 
 /************************************************************************
  * pull_card_data(): Function that accepts the current line being read  *
@@ -219,80 +247,16 @@ int find_length(card *hl) {
     return length;
 }
 
-/************************************************************************
- * print_list(): Standard function that traverses the Linked List and   *
- *      prints the formatted Card Struct at each stop along the way.    *
- *      Generic in the formatted output due to no unicode usage.        *
- *                                                                      *
- * Parameters: p - head of the list to be traversed, used as the start  *
- *      point for the traversal. Iterates until NEXT ptr is NULL        *
- ************************************************************************/
-void print_list(card *p) {
-    card *curr = p;
-    while (curr != NULL) {
-        printf("[%d : %s] -> ", curr->value, curr->suit);
-        curr = curr->next;
-    }
-    printf("NULL\n");
-}
-
-
 
 /************************************************************************
- * print_formatted_list(): Print function that outputs the formatted    *
- *      values of the struct by converting the suit into their unicode  *
- *      equivalent.
- *                                                                      *
- * Parameters: p - head of the list to be traversed, used as the start  *
- *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ * rand_gen(): Function that generates a random number from 0 to length *
+ *      of the LinkedList in order to pull two indices to swap their    *
+ *      values (i.e. their value and suit of card)                      *
  ************************************************************************/
-void print_formatted_list(card *p) {
-    card *curr = p;
-    while (curr != NULL) {
-        if (strcmp(curr->suit, "hearts") == 0) {
-            printf("[%d : \u2665] -> ", curr->value);
-        } else if (strcmp(curr->suit, "diamonds") == 0){
-            printf("[%d : \u2666] -> ", curr->value);
-        } else if (strcmp(curr->suit, "spades") == 0){
-            printf("[%d : \u2660] -> ", curr->value);
-        } else if (strcmp(curr->suit, "clubs") == 0){
-            printf("[%d : \u2663] -> ", curr->value);
-        }
-        curr = curr->next;
-    }
-    printf("NULL\n");
-}
-
-
-/************************************************************************
- * add_to_end(): Function that adds a Card Struct to the end of the     *
- *      Doubly-Linked List and makes the necessary changes to handle    *
- *      all cases of Linked List construction.                          *
- *                                                                      *
- * Parameters: p - Card Object that head-right is pointing to           *
- *             hl/hr - Double pointer that allows function to change    *
- *                  the value of hl/hr without having to return both.   *
- *             temp_card - Card Object that needs to be added to end.   *
- ************************************************************************/
-void add_to_end(card *p, card **hl, card **hr, card *temp_card) {
-    
-    if (*hl == NULL) {
-        // List is empty
-        *hl = temp_card;
-        *hr = temp_card;
-        temp_card->next = NULL;
-        temp_card->prev = NULL;
-    } else if (p->next == NULL) {
-        p->next = temp_card;
-        temp_card->prev = p;
-        temp_card->next = NULL;
-        *hr = temp_card;
-    }
-    
-    temp_card = NULL; // Clears buffer for suit (removes any characters remaining inside)
-    
-    
-    
+int rand_gen(int count) {
+    double frac;
+    frac = (double)rand()/((double)RAND_MAX+1);
+    return floor(count*frac);
 }
 
 
@@ -344,12 +308,44 @@ void swap(card *pt, int i, int j) {
 
 
 /************************************************************************
- * rand_gen(): Function that generates a random number from 0 to length *
- *      of the LinkedList in order to pull two indices to swap their    *
- *      values (i.e. their value and suit of card)                      *
+ * print_list(): Standard function that traverses the Linked List and   *
+ *      prints the formatted Card Struct at each stop along the way.    *
+ *      Generic in the formatted output due to no unicode usage.        *
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
  ************************************************************************/
-int rand_gen(int count) {
-    double frac;
-    frac = (double)rand()/((double)RAND_MAX+1);
-    return floor(count*frac);
+void print_list(card *p) {
+    card *curr = p;
+    while (curr != NULL) {
+        printf("[%d : %s] -> ", curr->value, curr->suit);
+        curr = curr->next;
+    }
+    printf("NULL\n");
+}
+
+
+/************************************************************************
+ * print_formatted_list(): Print function that outputs the formatted    *
+ *      values of the struct by converting the suit into their unicode  *
+ *      equivalent.
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
+void print_formatted_list(card *p) {
+    card *curr = p;
+    while (curr != NULL) {
+        if (strcmp(curr->suit, "hearts") == 0) {
+            printf("[%d : \u2665] -> ", curr->value);
+        } else if (strcmp(curr->suit, "diamonds") == 0){
+            printf("[%d : \u2666] -> ", curr->value);
+        } else if (strcmp(curr->suit, "spades") == 0){
+            printf("[%d : \u2660] -> ", curr->value);
+        } else if (strcmp(curr->suit, "clubs") == 0){
+            printf("[%d : \u2663] -> ", curr->value);
+        }
+        curr = curr->next;
+    }
+    printf("NULL\n");
 }
