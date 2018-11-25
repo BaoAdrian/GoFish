@@ -71,6 +71,8 @@ typedef struct card_s {
         
         ... // Code for shuffling explained below...
   ```
+  Note the dynamic allocation of memory for each Card Struct within the for loop. This satisfies the requirement of generation a deck of cards dynamically ensuring proper usage of memory. 
+  
   
   Once the deck is generated, it is then shuffled by swapping two randomly selected cards within the deck. This operation is performed 200 times to ensure a unique shuffled deck. Once the deck is shuffled, the output is then printed as follows: </p>
 
