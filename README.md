@@ -23,6 +23,20 @@ Final Project for ECE175
 
 <h2> 1. Doubly-Linked List Implementation </h2>
 
+<p> This program implements the use of Doubly-Linked List for the ease of traversal and pointer adjustments when adding and removing cards to and from user decks and pool of cards. The following Struct declaration was used to hold specified attributes needed for the Card information and Doubly-Linked List capabilites: 
+
+```C
+typedef struct card_s {
+    char suit[SUIT_LENGTH];
+    int value;
+    struct card_s *prev;
+    struct card_s *next;
+} card;
+```
+</p>
+
+<br>
+
 <p> The first portion of this program requires the use to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
 
 <h3> Shuffled Deck Selection </h3>
@@ -85,4 +99,4 @@ if (*hl == NULL) {
 
 The process of executing the above mentioned code is as follows:
 
-<img src = "Project_Images/LinkedList_Add_to_Empty.png" width = "400" height = "900" hspace = "10" alt="add to empty list">
+<img src = "Project_Images/LinkedList_Add_to_Empty.png" width = "700" height = "900" hspace = "10" alt="add to empty list">
