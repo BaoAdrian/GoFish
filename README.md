@@ -37,7 +37,7 @@ typedef struct card_s {
 
 <br>
 
-<p> The first portion of this program requires the use to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
+<p> The first portion of this program requires the user to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
 
 <h3> Shuffled Deck Selection </h3>
 <p> Work in progress. When selected, program should loop through a set of arrays holding ranks and suits and automatically create a deck which can then be looped through and shuffled a set number of times to essentially present the users with a shuffled deck. </p>
@@ -100,3 +100,17 @@ if (*hl == NULL) {
 The process of executing the above mentioned code is as follows:
 
 <img src = "Project_Images/LinkedList_Add_to_Empty.png" width = "700" height = "900" hspace = "10" alt="add to empty list">
+</p>
+<br>
+<p> The second case that is handled when adding to the list is when there is already Card Objects in the list, i.e. <strong>head-left is NOT NULL</strong>. When head-left is checked and found that it is pointing to a Card, then we must adjust the necessary pointers as before only this time, we need to ensure the <strong>prev</strong> attribute is adjusted. Note that <strong>p</strong> here is the Card that <strong>hr</strong> (head-right) is pointing to as stated in the function call. When <strong>p->next</strong> is NULL, that means it is the last element in the list and that is where the current Card should be inserted.
+  
+  ```C
+  else if (p->next == NULL) {
+      p->next = temp_card;
+      temp_card->prev = p;
+      temp_card->next = NULL;
+      *hr = temp_card;
+  }
+  ```
+
+</p>
