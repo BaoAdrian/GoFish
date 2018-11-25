@@ -21,7 +21,7 @@ Final Project for ECE175
 
 <h1> Construction Documentation </h1>
 
-<h2> Doubly-Linked List Implementation </h2>
+<h2> 1. Doubly-Linked List Implementation </h2>
 
 <p> The first portion of this program requires the use to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
 
