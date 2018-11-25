@@ -44,7 +44,7 @@ typedef struct card_s {
 
 <p> The first portion of this program requires the user to choose if they want to a shuffled deck or load a predefined set of cards from a file. The current implementation of the program currently sets the selection based off a binary choice. If the user selects 0, a shuffled deck is generated and displayed. If the user selects 1, a file is read and parsed into a deck and displayed. </p>
 
-<h3> Shuffled Deck Selection </h3>
+<h3> First Option: Shuffled Deck Selection (0) </h3>
 
 <p> This option, if selected, will generate a deck of 52 cards using for loops and runs the deck through the shuffler that performs 200 swaps and displays the pre- and post-shuffled decks to the user. The generation is done using two nested for loops, the outer loop controlling the rank (1-13) and the inner loop controlling the suit (hearts, diamonds, clubs, spades). The following snippet shows how the deck is generated. (NOTE: description of the <strong>add_to_head( ... )</strong> function is further below).
   
@@ -83,7 +83,7 @@ typedef struct card_s {
 
 <br>
 
-<h3> Read from file Selection </h3>
+<h3> Second Option: Read from file Selection (1) </h3>
 
 <p> When the user selects this option, the program will read input from a specified file in the following format: 
   
