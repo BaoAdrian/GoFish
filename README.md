@@ -120,6 +120,6 @@ The process of executing the above mentioned code is as follows:
 
 Once the file is completely processed and all data has been parsed into Card Structs, then the Doubly-Linked List is fully constructed with a total of 52 Cards. When the program is run using <strong>ordered_deck.txt</strong>, which is a file that sequentially goes through each suit and rank, the output of that program will look like the following. (NOTE: Current output is only formatted with unicode symbols, actual card representations will follow in future updates).
 
-<img src = "Project_Images/ordered_text_output.png" width = "1100" height = "120" hspace = "10" alt="ordered text output">
+<img src = "Project_Images/ordered_text_output.png" width = "1100" height = "105" hspace = "10" alt="ordered text output">
 
 </p>
