@@ -113,7 +113,7 @@ typedef struct card_s {
   add_to_end(hr, &hl, &hr, temp_card);
   ```
   
-  Here, hr is the current Card Object that the pointer, hr (head-right), is pointing to. <strong>&hr and &hl</strong> are the address of the head pointers themselves so that the add_to_head function can make the necessary adjustments after the Card Object has been added to the LinkedList. The receiving parameters of the function look like the following:
+  Here, hr is the current Card Object that the pointer, hr (head-right), is pointing to. <strong>&hr and &hl</strong> are the address of the head pointers themselves so that the add_to_end function can make the necessary adjustments after the Card Object has been added to the LinkedList. The receiving parameters of the function look like the following:
   
   ```C
   void add_to_end(card *p, card **hl, card **hr, card *temp_card) { ... }
