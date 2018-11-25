@@ -38,9 +38,12 @@ Final Project for ECE175
   Rank Suit
   Rank Suit
   ...
+  A hearts
+  8 diamonds
+  9 spades
   ```
   
-  Rank will be provided in the following range: A, 2-10, J, Q, K. The program will read the Rank in as a character and type case it to an int with the following guidelines:
+  Suits are formatted as all lowercase and placed a single space after the given Rank. Rank will be provided in the following range: A, 2-10, J, Q, K. The program will read the Rank in as a character and typecast it to an <strong>int</strong> with the following guidelines:
   
   ```
   A -> 1
