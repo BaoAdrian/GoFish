@@ -66,9 +66,14 @@ Final Project for ECE175
   void add_to_end(card *p, card **hl, card **hr, char line[]) { ... }
   ```
 
-The return type is void since all changes made to head-left and head-right occur within the function, reassigning pointers when necessary. Two cases are handled within this function. The first is when the list is currently empty, that means that <strong>head-left</strong> does not point to anything, thus is equal to NULL. If check is made for this condition and the result is TRUE, then we must first set the two head pointers (head-left and head-right) to point to the new Card introduced to the LinkedList. The final step once the pointers are set is to set the internal attributes of the Card. Since it was the first Card added to the LinkedList, we need to set the <strong>next</strong> and <strong>prev</strong> attributes to NULL since they will not point to anything yet.
+The return type is void since all changes made to head-left and head-right occur within the function, reassigning pointers when necessary. As stated before, hl and hr and references to the pointers in main so that we can make adjustments within this function without having to return them both...
+
+Two cases are handled within this function. The first is when the list is currently empty, that means that <strong>head-left</strong> does not point to anything, thus is equal to NULL. If check is made for this condition and the result is TRUE, then we must first set the two head pointers (head-left and head-right) to point to the new Card introduced to the LinkedList. The final step once the pointers are set is to set the internal attributes of the Card. Since it was the first Card added to the LinkedList, we need to set the <strong>next</strong> and <strong>prev</strong> attributes to NULL since they will not point to anything yet.
 
 ```C
+card *temp_card = (card*)malloc(sizeof(card));
+temp_card = pull_card_data(line); // Parse data from line
+    
 if (*hl == NULL) {
      // List is empty
      *hl = temp_card;
@@ -77,3 +82,7 @@ if (*hl == NULL) {
      temp_card->prev = NULL;
 } else { ... }
 ```
+
+The process of executing the above mentioned code is as follows:
+
+<img src = "Project_Images/LinkedList_Add_to_Empty.png" width = "400" height = "900" hspace = "10" alt="add to empty list">
