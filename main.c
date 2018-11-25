@@ -49,7 +49,7 @@ int main(void) {
     card *hl = NULL;
     card *hr = NULL;
     
-    
+    // Get user selection: use shuffled deck(0) or use preformatted file input (1)
     deck_init = get_init_deck();
     
     
@@ -74,6 +74,29 @@ int main(void) {
             }
         }
         
+        // Print before swap
+        printf("GENERATED DECK: \n");
+        print_formatted_list(hl);
+        
+        // Deck is constructed, shuffle the deck (perform 200 swaps)
+        int num_cards = find_length(hl);
+        
+        int num_swaps = 200;
+        int idx_1, idx_2;
+        for (int i = 0; i < num_swaps; i++) {
+            idx_1 = rand_gen(num_cards);
+            idx_2 = rand_gen(num_cards);
+            
+            // Need to ensure that we don't swap a card with itself
+            while (idx_2 == idx_1) {
+                // Grab another random index
+                idx_2 = rand_gen(num_cards);
+            }
+            swap(hl, idx_1, idx_2);
+        }
+        
+        printf("\n\nSHUFFLED DECK: \n");
+        
     } else if (deck_init == 1) {
         // Load deck from preformatted file
         FILE *inp;
@@ -88,33 +111,10 @@ int main(void) {
             temp_card = pull_card_data(line); // Parse data from line
             add_to_end(hr, &hl, &hr, temp_card);
         }
-    }
-    
-    
-    // At this point, list is fully populated with length of 52
-    int num_cards = find_length(hl);
-    
-    // Print before swap
-    printf("BEFORE SHUFFLING: \n");
-    print_formatted_list(hl);
-    
-    // Perform 100 swaps
-    int num_swaps = 100;
-    int idx_1, idx_2;
-    for (int i = 0; i < num_swaps; i++) {
-        idx_1 = rand_gen(num_cards);
-        idx_2 = rand_gen(num_cards);
         
-        // Need to ensure that we don't swap a card with itself
-        while (idx_2 == idx_1) {
-            // Grab another random index
-            idx_2 = rand_gen(num_cards);
-        }
-        swap(hl, idx_1, idx_2);
+        printf("\nDECK FROM FILE: \n");
     }
     
-    
-    printf("\n\nAFTER SHUFFLING: \n");
     
     // Print after swapping first two values
     print_formatted_list(hl);
