@@ -18,3 +18,35 @@ Final Project for ECE175
 
 - Output also formatted to display the unicode character instead of the word. Will be replaced in the future with actual card designs.</li>
 </ul>
+
+<h1> Construction Documentation </h1>
+
+<h2> Doubly-Linked List Implementation </h2>
+
+<p> The first portion of this program requires the use to choose if they want to shuffle a deck or load a predefined set of cards from a file. The current implementation of the program currently supports the latter with the former to be implemented in the future. The implementation is as follows. </p>
+
+<h3> Shuffled Deck Selection </h3>
+<p> Work in progress. When selected, program should loop through a set of arrays holding ranks and suits and automatically create a deck which can then be looped through and shuffled a set number of times to essentially present the users with a shuffled deck. </p>
+
+<br>
+
+<h3> Read from file Selection </h3>
+
+<p> When the user selects this option, the program will read input from a specified file in the following format: 
+  
+  ```C
+  Rank Suit
+  Rank Suit
+  ...
+  ```
+  
+  Rank will be provided in the following range: A, 2-10, J, Q, K. The program will read the Rank in as a character and type case it to an int with the following guidelines:
+  
+  ```
+  A -> 1
+  J -> 11
+  Q -> 12
+  K -> 13
+  ```
+  
+  This allows for ease of processing later in the program when the users are playing the game of GoFish and requesting for a specific suit. Rather than having to search for a specific character, they are order sequentially by values starting from 1 to 13.
