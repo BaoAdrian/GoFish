@@ -15,7 +15,7 @@
 const int LINE_SIZE = 15;
 const int SUIT_LENGTH = 10;
 
-// Card declaration
+/* Card declaration */
 typedef struct card_s {
     char suit[SUIT_LENGTH];
     int value;
@@ -53,9 +53,10 @@ int main(void) {
     deck_init = get_init_deck();
     
     
-    char suits[4] = {'h', 'd', 'c', 's'};
     
     if (deck_init == 0) {
+        char suits[4] = {'h', 'd', 'c', 's'};
+        
         // Construct a standard sequential deck then shuffle it 200 times
         for (int i = 1; i <= 13; i++) {
             for (int j = 0; j < 4; j++) {
@@ -122,6 +123,12 @@ int main(void) {
     return 0;
 }
 
+/************************************************************************
+ * get_init_deck(): Function that returns the binary choice (0 or 1)    *
+ *      that the user selected as the deck generation method.           *
+ *                                                                      *
+ * Parameters - None                                                    *
+ ************************************************************************/
 int get_init_deck(void) {
     
     int deck_init;
@@ -140,6 +147,14 @@ int get_init_deck(void) {
     
 }
 
+/************************************************************************
+ * pull_card_data(): Function that accepts the current line being read  *
+ *      from the file and uses the pre-determined format to parse the   *
+ *      data, create a Card Struct and return that Card Struct.         *
+ *                                                                      *
+ * Parameters: line - current line being read from the file.            *
+ * -> format of line: Rank Suit ----> EXAMPLE: 8 spades OR K diamonds   *
+ ************************************************************************/
 card* pull_card_data(char line[]) {
     
     char *temp;
@@ -181,6 +196,14 @@ card* pull_card_data(char line[]) {
     
 }
 
+
+/************************************************************************
+ * find_length(): Function that traverses the Linked List and counts    *
+ *      returns the number of Card Structs that exist in the list.      *
+ *                                                                      *
+ * Parameters: hl - head of the list to be traversed, used as the start *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
 int find_length(card *hl) {
     
     int length = 0;
@@ -196,7 +219,14 @@ int find_length(card *hl) {
     return length;
 }
 
-
+/************************************************************************
+ * print_list(): Standard function that traverses the Linked List and   *
+ *      prints the formatted Card Struct at each stop along the way.    *
+ *      Generic in the formatted output due to no unicode usage.        *
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
 void print_list(card *p) {
     card *curr = p;
     while (curr != NULL) {
@@ -206,6 +236,16 @@ void print_list(card *p) {
     printf("NULL\n");
 }
 
+
+
+/************************************************************************
+ * print_formatted_list(): Print function that outputs the formatted    *
+ *      values of the struct by converting the suit into their unicode  *
+ *      equivalent.
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
 void print_formatted_list(card *p) {
     card *curr = p;
     while (curr != NULL) {
@@ -223,6 +263,17 @@ void print_formatted_list(card *p) {
     printf("NULL\n");
 }
 
+
+/************************************************************************
+ * add_to_end(): Function that adds a Card Struct to the end of the     *
+ *      Doubly-Linked List and makes the necessary changes to handle    *
+ *      all cases of Linked List construction.                          *
+ *                                                                      *
+ * Parameters: p - Card Object that head-right is pointing to           *
+ *             hl/hr - Double pointer that allows function to change    *
+ *                  the value of hl/hr without having to return both.   *
+ *             temp_card - Card Object that needs to be added to end.   *
+ ************************************************************************/
 void add_to_end(card *p, card **hl, card **hr, card *temp_card) {
     
     if (*hl == NULL) {
