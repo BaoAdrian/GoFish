@@ -115,6 +115,11 @@ The process of executing the above mentioned code is as follows:
   ```
 
 The process of executing the above mentioned code is as follows:
-<img src = "Project_Images/LinkedList_Add_to_End.png" width = "700" height = "900" hspace = "10" alt="add to empty list">
+<img src = "Project_Images/LinkedList_Add_to_End.png" width = "700" height = "900" hspace = "10" alt="add to end">
+<br>
+
+Once the file is completely processed and all data has been parsed into Card Structs, then the Doubly-Linked List is fully constructed with a total of 52 Cards. When the program is run using <strong>ordered_deck.txt</strong>, which is a file that sequentially goes through each suit and rank, the output of that program will look like the following. (NOTE: Current output is only formatted with unicode symbols, actual card representations will follow in future updates).
+
+<img src = "Project_Images/ordered_text_output.png" width = "800" height = "400" hspace = "10" alt="ordered text output">
 
 </p>
