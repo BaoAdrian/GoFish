@@ -24,8 +24,9 @@ typedef struct card_s {
 } card;
 
 /* Function Prototypes */
+int get_init_deck(void);
 void create_list(card *card); // Function used to create the deck of cards to be used as the pool
-void add_to_end(card *p, card **hl, card **hr, char line[]); // Add card to end of list
+void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
 card* pull_card_data(char line[]);
 int find_length(card *hl);
 void print_list(card *card);
@@ -42,25 +43,52 @@ int main(void) {
     
     /* Variable Declarations */
     char line[LINE_SIZE];
+    int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     
     // Declare head and tail pointer to keep track of each end of the list
     card *hl = NULL;
     card *hr = NULL;
     
-    // Input file that may be used to read in the formatted output to populate linkedlist
-    FILE *inp;
-    inp = fopen("ordered_deck.txt", "r");
-    if (inp == NULL) {
-        printf("ERROR: Could not open file. Ending Program\n");
-        return -1;
+    
+    deck_init = get_init_deck();
+    
+    
+    char suits[4] = {'h', 'd', 'c', 's'};
+    
+    if (deck_init == 0) {
+        // Construct a standard sequential deck then shuffle it 200 times
+        for (int i = 1; i <= 13; i++) {
+            for (int j = 0; j < 4; j++) {
+                card *temp_card = (card*)malloc(sizeof(card));
+                temp_card->value = i;
+                if (suits[j] == 'h') {
+                    strcpy(temp_card->suit, "hearts");
+                } else if (suits[j] == 'd') {
+                    strcpy(temp_card->suit, "diamonds");
+                } else if (suits[j] == 'c') {
+                    strcpy(temp_card->suit, "clubs");
+                } else if (suits[j] == 's') {
+                    strcpy(temp_card->suit, "spades");
+                }
+                add_to_end(hr, &hl, &hr, temp_card);
+            }
+        }
+        
+    } else if (deck_init == 1) {
+        // Load deck from preformatted file
+        FILE *inp;
+        inp = fopen("ordered_deck.txt", "r");
+        if (inp == NULL) {
+            printf("ERROR: Could not open file. Ending Program\n");
+            return -1;
+        }
+        
+        while (fgets(line, LINE_SIZE, inp) != NULL) {
+            card *temp_card = (card*)malloc(sizeof(card));
+            temp_card = pull_card_data(line); // Parse data from line
+            add_to_end(hr, &hl, &hr, temp_card);
+        }
     }
-    
-    
-    
-    while (fgets(line, LINE_SIZE, inp) != NULL) {
-        add_to_end(hr, &hl, &hr, line);
-    }
-    
     
     
     // At this point, list is fully populated with length of 52
@@ -92,6 +120,24 @@ int main(void) {
     print_formatted_list(hl);
     
     return 0;
+}
+
+int get_init_deck(void) {
+    
+    int deck_init;
+    
+    printf("Would you like a shuffled deck (0) or a deck provided from a file (1)? Please choose 0 or 1: ");
+    scanf("%d", &deck_init);
+    
+    // Loop until valid delection is made
+    while (deck_init != 0 && deck_init != 1) {
+        printf("\nERROR, that is not a valid selection.\n");
+        printf("Would you like a shuffled deck (0) or a deck provided from a file (1)? Please choose 0 or 1: ");
+        scanf("%d", &deck_init);
+    }
+    
+    return deck_init;
+    
 }
 
 card* pull_card_data(char line[]) {
@@ -157,6 +203,7 @@ void print_list(card *p) {
         printf("[%d : %s] -> ", curr->value, curr->suit);
         curr = curr->next;
     }
+    printf("NULL\n");
 }
 
 void print_formatted_list(card *p) {
@@ -173,13 +220,10 @@ void print_formatted_list(card *p) {
         }
         curr = curr->next;
     }
+    printf("NULL\n");
 }
 
-void add_to_end(card *p, card **hl, card **hr, char line[]) {
-    
-    card *temp_card = (card*)malloc(sizeof(card));
-    
-    temp_card = pull_card_data(line);
+void add_to_end(card *p, card **hl, card **hr, card *temp_card) {
     
     if (*hl == NULL) {
         // List is empty
@@ -240,11 +284,9 @@ void swap(card *pt, int i, int j) {
     strcpy(temp_suit, node_1->suit);
     
     node_1->value = node_2->value;
-    //node_1->suit[0] = '\0';
     strcpy(node_1->suit, node_2->suit);
     
     node_2->value = temp_value;
-    //node_2->suit[0] = '\0';
     strcpy(node_2->suit, temp_suit);
     
 }
