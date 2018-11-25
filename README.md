@@ -49,29 +49,29 @@ typedef struct card_s {
 <p> This option, if selected, will generate a deck of 52 cards using for loops and runs the deck through the shuffler that performs 200 swaps and displays the pre- and post-shuffled decks to the user. The generation is done using two nested for loops, the outer loop controlling the rank (1-13) and the inner loop controlling the suit (hearts, diamonds, clubs, spades). The following snippet shows how the deck is generated. (NOTE: description of the <strong>add_to_head( ... )</strong> function is further below).
   
   ```C
-  char suits[4] = {'h', 'd', 'c', 's'}; // Used to iterate through each suit of the deck
-  if (deck_init == 0) {
-        // Construct a standard sequential deck then shuffle it 200 times
-        for (int i = 1; i <= 13; i++) {
-            for (int j = 0; j < 4; j++) {
-                card *temp_card = (card*)malloc(sizeof(card));
-                temp_card->value = i;
-                if (suits[j] == 'h') {
-                    strcpy(temp_card->suit, "hearts");
-                } else if (suits[j] == 'd') {
-                    strcpy(temp_card->suit, "diamonds");
-                } else if (suits[j] == 'c') {
-                    strcpy(temp_card->suit, "clubs");
-                } else if (suits[j] == 's') {
-                    strcpy(temp_card->suit, "spades");
-                }
-                add_to_end(hr, &hl, &hr, temp_card); // Adds temp_card to the list
-            }
-        }
-        
-        ... // Code for shuffling explained below...
+  1 char suits[4] = {'h', 'd', 'c', 's'}; // Used to iterate through each suit of the deck
+  2 if (deck_init == 0) {
+  3      // Construct a standard sequential deck then shuffle it 200 times
+  4      for (int i = 1; i <= 13; i++) {
+  5          for (int j = 0; j < 4; j++) {
+  6              card *temp_card = (card*)malloc(sizeof(card));
+  7              temp_card->value = i;
+  8              if (suits[j] == 'h') {
+  9                  strcpy(temp_card->suit, "hearts");
+  10             } else if (suits[j] == 'd') {
+  11                 strcpy(temp_card->suit, "diamonds");
+  12             } else if (suits[j] == 'c') {
+  13                 strcpy(temp_card->suit, "clubs");
+  14             } else if (suits[j] == 's') {
+  15                 strcpy(temp_card->suit, "spades");
+  16             }
+  17             add_to_end(hr, &hl, &hr, temp_card); // Adds temp_card to the list
+  18         }
+  19     }
+  20      
+  21     ... // Code for shuffling explained below...
   ```
-  Note the dynamic allocation of memory for each Card Struct within the for loop. This satisfies the requirement of generation a deck of cards dynamically ensuring proper usage of memory. 
+  Note the dynamic allocation of memory for each Card Struct within the for loop. This satisfies the requirement of the dynamically generating a deck of cards, ensuring proper usage of memory. Line 6 of the snippet above dynamically allocates memory to the pointer, the size of which is the size of a Card Struct. This newly allocated memory is then populated with the data pulled from the loops and added to the Linked List with the function call of <strong>add_to_head( ... )</strong> at line 17.
   
   
   Once the deck is generated, it is then shuffled by swapping two randomly selected cards within the deck. This operation is performed 200 times to ensure a unique shuffled deck. Once the deck is shuffled, the output is then printed as follows: </p>
