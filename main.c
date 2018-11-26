@@ -15,6 +15,7 @@
 
 const int LINE_SIZE = 15;
 const int SUIT_LENGTH = 10;
+const int NUM_OF_SWAPS = 200;
 
 /* Card declaration */
 typedef struct card_s {
@@ -232,19 +233,23 @@ card* pull_card_data(char line[]) {
     
     temp_card->suit[i] = '\0'; // terminate the string
     
-    
-    
     return temp_card;
     
 }
 
 
+/************************************************************************
+ * shuffle_deck(): Function that accepts the pointer to the head of the *
+ *      LinkedList and uses the reference as a starting point for the   *
+ *      shuffling method. Performs a specifiec number of swaps on two   *
+ *      randomly selected indices of the LinkedList.                    *
+ ************************************************************************/
 void shuffle_deck(card *hl) {
     
     // Find number of cards present in the pool
     int num_cards = find_length(hl);
     
-    int num_swaps = 200;
+    int num_swaps = NUM_OF_SWAPS;
     int idx_1, idx_2;
     for (int i = 0; i < num_swaps; i++) {
         idx_1 = rand_gen(num_cards);
