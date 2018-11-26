@@ -4,13 +4,13 @@ Final Project for ECE175
 <h1> Directory </h1>
 
 <ul>
-  <li> Project Images </li>
+  <li> <strong>Project Images</strong> </li>
   - This folder includes various output images taken of the program behavior as documentation used below.
-  <li> Reference Programs </li>
+  <li> <strong>Reference Programs</strong> </li>
   - Folder that includes simplified implementations of doubly-linked lists and shuffling mechanics.
-  <li> Test Files </li>
+  <li> <strong>Test Files</strong> </li>
   - Folder that includes the various .txt files that are used to test the option where the user can provide a file to be read and generate a 52-card deck from the contents of the file.
-  <li> Visual Design </li>
+  <li> <strong>Visual Design</strong> </li>
   - Folder that includes the general structure design of various aspects of the program, such as the visual design of the deck and player-hands as well as the visual design of a possible title. 
 </ul> 
 
