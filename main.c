@@ -241,7 +241,7 @@ card* pull_card_data(char line[]) {
 
 void shuffle_deck(card *hl) {
     
-    // Deck is constructed, shuffle the deck (perform 200 swaps)
+    // Find number of cards present in the pool
     int num_cards = find_length(hl);
     
     int num_swaps = 200;
