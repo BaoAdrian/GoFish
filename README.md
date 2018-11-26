@@ -74,7 +74,28 @@ typedef struct card_s {
   Note the dynamic allocation of memory for each Card Struct within the for loop. This satisfies the requirement of the dynamically generating a deck of cards, ensuring proper usage of memory. Line 6 of the snippet above dynamically allocates memory to the pointer, the size of which is the size of a Card Struct. This newly allocated memory is then populated with the data pulled from the loops and added to the Linked List with the function call of <strong>add_to_head( ... )</strong> at line 17.
   
   
-  Once the deck is generated, it is then shuffled by swapping two randomly selected cards within the deck. This operation is performed 200 times to ensure a unique shuffled deck. Once the deck is shuffled, the output is then printed as follows: </p>
+  Once the deck is generated, it is then shuffled by swapping two randomly selected cards within the deck. This operation is performed 200 times to ensure a unique shuffled deck. When calling the shuffle function, <strong>hl (head-left)</strong> is passed to the function to allow the method to have access to the entire Linked List. Inside the shuffle function, two random indices are generated using RNG and used to traverse the Linked List and perform the swap on the two cards. 
+  
+  ```C
+    // Find number of cards present in the pool
+    int num_cards = find_length(hl);
+    
+    int num_swaps = 200;
+    int idx_1, idx_2;
+    for (int i = 0; i < num_swaps; i++) {
+        idx_1 = rand_gen(num_cards);
+        idx_2 = rand_gen(num_cards);
+        
+        // Need to ensure that we don't swap a card with itself
+        while (idx_2 == idx_1) {
+            // Grab another random index
+            idx_2 = rand_gen(num_cards);
+        }
+        swap(hl, idx_1, idx_2);
+    }
+  ```
+  
+  Once the deck is shuffled, the output is then printed as follows: </p>
 
 <img src = "Project_Images/generated_shuffled_deck.png" width = "1100" height="175" hspace="10" alt="generated shuffle deck">
 
