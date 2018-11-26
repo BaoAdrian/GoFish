@@ -1,6 +1,11 @@
 # GoFish
 Final Project for ECE175
 
+<h1> Directory </h1>
+
+<ul>
+  <li>  </li>
+</ul> 
 
 <h1> Latest Adjustments </h1>
 
