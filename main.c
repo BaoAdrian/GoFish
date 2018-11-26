@@ -2,8 +2,9 @@
 //  main.c
 //  ECE175_FinalProject
 //
-//  Created by Adrian Bao on 11/21/18.
-//  Copyright © 2018 Adrian Bao. All rights reserved.
+//  Created by Adrian Bao and Liam Gill on 11/21/2018
+//
+//  GoFish Game Implemented using Doubly-Linked Lists and Dynamic Memory Management
 //
 
 #include <stdio.h>
@@ -24,6 +25,7 @@ typedef struct card_s {
 } card;
 
 /* Function Prototypes */
+void print_title(); /* LIAM */
 int get_init_deck(void);
 void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
 card* pull_card_data(char line[]); // Parse line from file into Card Struct
@@ -118,7 +120,32 @@ int main(void) {
     // Print after swapping first two values
     print_formatted_list(hl);
     
+    
+    
+    /* Next steps */
+    
+    // Dynamically build inital hands for the players (removing from pool)
+    
+    // Set structure of the game by calling queries on each deck until a winner is found
+    // winner is declared if their hand is empty.
+    
+    // If query returns false, remove a card from pool and add to players hand, switch turns
+    
+    // If 4 cards (book) is detected in users hand, remove it from their hand and free the memory (no longer needed)
+    
+    
+    
     return 0;
+}
+
+
+/************************************************************************
+ * print_title(): Nice title to add to the UI Element of the program    *
+ ************************************************************************/
+void print_title() {
+    
+    /* LIAM */
+
 }
 
 
