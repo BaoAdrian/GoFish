@@ -25,10 +25,11 @@ typedef struct card_s {
 } card;
 
 /* Function Prototypes */
-void print_title(); /* LIAM */
+void print_title(void); /* LIAM */
 int get_init_deck(void);
 void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
 card* pull_card_data(char line[]); // Parse line from file into Card Struct
+void shuffle_deck(card *hl);
 int find_length(card *hl);
 int rand_gen(int count);
 void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
@@ -79,22 +80,8 @@ int main(void) {
         printf("GENERATED DECK: \n");
         print_formatted_list(hl);
         
-        // Deck is constructed, shuffle the deck (perform 200 swaps)
-        int num_cards = find_length(hl);
-        
-        int num_swaps = 200;
-        int idx_1, idx_2;
-        for (int i = 0; i < num_swaps; i++) {
-            idx_1 = rand_gen(num_cards);
-            idx_2 = rand_gen(num_cards);
-            
-            // Need to ensure that we don't swap a card with itself
-            while (idx_2 == idx_1) {
-                // Grab another random index
-                idx_2 = rand_gen(num_cards);
-            }
-            swap(hl, idx_1, idx_2);
-        }
+        // Shuffled deck by passing just the head of the LinkedList
+        shuffle_deck(hl);
         
         printf("\n\nSHUFFLED DECK: \n");
         
@@ -248,6 +235,28 @@ card* pull_card_data(char line[]) {
     
     
     return temp_card;
+    
+}
+
+
+void shuffle_deck(card *hl) {
+    
+    // Deck is constructed, shuffle the deck (perform 200 swaps)
+    int num_cards = find_length(hl);
+    
+    int num_swaps = 200;
+    int idx_1, idx_2;
+    for (int i = 0; i < num_swaps; i++) {
+        idx_1 = rand_gen(num_cards);
+        idx_2 = rand_gen(num_cards);
+        
+        // Need to ensure that we don't swap a card with itself
+        while (idx_2 == idx_1) {
+            // Grab another random index
+            idx_2 = rand_gen(num_cards);
+        }
+        swap(hl, idx_1, idx_2);
+    }
     
 }
 
