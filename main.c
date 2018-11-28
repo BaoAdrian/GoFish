@@ -26,7 +26,7 @@ typedef struct card_s {
 } card;
 
 /* Function Prototypes */
-void print_title(void); /* LIAM */
+void print_title(void);
 int get_init_deck(void);
 void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
 card* pull_card_data(char line[]); // Parse line from file into Card Struct
@@ -37,9 +37,33 @@ void swap(card *pt, int i, int j); // Function used to swap cards at index i and
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
 
+/* Skeleton for the remaining project - Function Prototypes */
+/* NOTE: Return type of some functions has been undecided and may change in the future */
+/* NOTE (#2): void entered as parameter just to silence the warnings */
 
+void generate_hand(/* Generates a single hand (LinkedList), emulating similar behavior to add_to_end() function */ void);
+void transfer_cards(/* Function that will remove Card Struct(s) from a users hand and add to another players hand */ void);
+void go_fish(/* Function that will add a single card from the pool into the players hand who receives the 'GoFish'. */void);
+int check_for_winner(/* Function that will return a 0 or 1 if any player in the "field" has an empty hand. */void);
+int check_for_book(/* Will be called whenever a transfer occurs to see if the cards transferred complete a book. */void);
+void remove_book(/* Will be called when a book is detected. Will free the memory used by the completed book as they are not needed anymore. */void);
+int process_guess(/* Will return 0 or 1 depending on if the user's guess is contained in the opposing players hand. */void);
+
+
+/*
+ * NOTES REGARDING RANKS AND THEIR INTEGER EQUIVALENT
+ * - Values 2-10 remain unchanged. A, J, Q, K had to be adjusted as follows:
+ * - A -> 1
+ * - J -> 11
+ * - Q -> 12
+ * - K -> 13
+ * Used the values above will allow for ease of processing guess depending on what the user enters.
+ */
 
 int main(void) {
+    
+    // Print header
+    print_title();
     
     // Seed the RNG
     srand((int)time(NULL));
@@ -109,30 +133,35 @@ int main(void) {
     print_formatted_list(hl);
     
     
-    
-    /* Next steps */
-    
-    // Dynamically build inital hands for the players (removing from pool)
-    
-    // Set structure of the game by calling queries on each deck until a winner is found
-    // winner is declared if their hand is empty.
-    
-    // If query returns false, remove a card from pool and add to players hand, switch turns
-    
-    // If 4 cards (book) is detected in users hand, remove it from their hand and free the memory (no longer needed)
-    
-    
+    printf("\n\nRest of this project is under construction. Come back soon!\n\n");
     
     return 0;
 }
 
 
 /************************************************************************
- * print_title(): Nice title to add to the UI Element of the program    *
+ * print_title(): Title to add to the UI Element of the program         *
  ************************************************************************/
 void print_title() {
     
-    /* LIAM */
+    printf(" -----   -----   -----   -----   -----   -----\n");
+    printf("|A\u2665   | |K\u2665   | |Q\u2665   | |J\u2665   | |10\u2665  | |9\u2665   |\n");
+    printf("|     | |     | |     | |     | |     | |     |\n");
+    printf("|   A\u2665| |   K\u2665| |   Q\u2665| |   J\u2665| |  10\u2665| |   9\u2665|\n");
+    printf(" -----   -----   -----   -----   -----   -----\n");
+    
+    //  Prints START
+    printf(" -----    __  _____  ___   ___   _____   -----\n");
+    printf("|A\u2663   |  |      |   |   | |   |    |    |A\u2663   |\n");
+    printf("|     |   --    |   |---| | --     |    |     |\n");
+    printf("|   A\u2663|     |   |   |   | |  \\     |    |   A\u2663|\n");
+    printf(" -----    --    |   |   | |   \\    |     -----\n");
+    
+    printf(" -----   -----   -----   -----   -----   -----\n");
+    printf("|9\u2660   | |10\u2660  | |J\u2660   | |Q\u2660   | |K\u2660   | |A\u2660   |\n");
+    printf("|     | |     | |     | |     | |     | |     |\n");
+    printf("|   9\u2660| |  10\u2660| |   J\u2660| |   Q\u2660| |   K\u2660| |   A\u2660|\n");
+    printf(" -----   -----   -----   -----   -----   -----\n\n");
 
 }
 
@@ -181,6 +210,7 @@ void add_to_end(card *p, card **hl, card **hr, card *temp_card) {
         temp_card->next = NULL;
         temp_card->prev = NULL;
     } else if (p->next == NULL) {
+        // Add to the end of the list
         p->next = temp_card;
         temp_card->prev = p;
         temp_card->next = NULL;
@@ -389,4 +419,65 @@ void print_formatted_list(card *p) {
         curr = curr->next;
     }
     printf("NULL\n");
+}
+
+/*********************************************/
+/* Rest of the Project to be completed below */
+/*********************************************/
+
+void generate_hand() {
+    /*
+     * This process will be repeated a specific number of times depending on the amount of players
+     * currently playing. Another limitation will be how many card the players receive which also
+     * depends on the number of players currently in the game.
+     */
+}
+
+void transfer_cards() {
+    /*
+     * This function will be used when the user processes a query, i.e. makes a guess. If the other
+     * opposing player contains a card that the user requested, a transfer must occur where all cards
+     * matching that rank will be transferred from the opposing players hand to the guessing players hand
+     */
+}
+
+void go_fish() {
+    /*
+     * This function will be used when the user processes a query on an opposing players hand and the
+     * opposing player does not contain any card of that rank in their hand. In this case, this function
+     * will remove a card from the pool of cards and add to the guessing player's hand.
+     */
+}
+
+int check_for_winner() {
+    /*
+     * This function will be used to see if any of the player's hands are currently pointing to NULL
+     * if that is the case, then they do not possess any cards anymore and have won the game.
+     */
+    return 0; // temporary
+}
+
+int check_for_book() {
+    /*
+     * This function will be used whenever a transfer or GoFish occurs. When a new card is introduced into
+     * someones deck, then this function will check to see if the card added completes a book. If so,
+     * it returns 1, else it returns 0.
+     */
+    return 0; // temporary
+}
+
+void remove_book() {
+    /*
+     * This function will be called when a book is detected and will remove all cards of the rank completing the book and
+     * free the memory allocated by the card
+     */
+}
+
+int process_guess() {
+    /*
+     * This function will be called whenever a player is guessing a specific rank to another opposing player.
+     * It will check to see if their hand contains the rank they are searching for and returns 1 if so, otherwise
+     * it returns 0.
+     */
+    return 0; // temporary
 }
