@@ -197,3 +197,10 @@ Once the file is completely processed and all data has been parsed into Card Str
 <img src = "Project_Images/ordered_text_output.png" width = "1100" height = "105" hspace = "10" alt="ordered text output">
 
 </p>
+
+
+<h3> Initial Title </h3>
+
+<p> The current title implemented into the program is used to enhance the UI Element of the program. It may be changed a future update. </p>
+
+<img src="Project_Images/Initial_Title.PNG" width="600" height ="400" hspace="10" alt="Intial Title">
