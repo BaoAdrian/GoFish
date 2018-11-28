@@ -203,4 +203,4 @@ Once the file is completely processed and all data has been parsed into Card Str
 
 <p> The current title implemented into the program is used to enhance the UI Element of the program. It may be changed a future update. </p>
 
-<img src="Project_Images/Initial_Title.png" width="600" height ="400" hspace="10" alt="Initial Title">
+<img src="Project_Images/Initial_Title.png" width="400" height ="200" hspace="10" alt="Initial Title">
