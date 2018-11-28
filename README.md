@@ -37,6 +37,8 @@ Final Project for ECE175
   - (1) User provides a pre-formatted file that will be read and parsed to generate a deck from the contents of the file.
 </li>
 <li> 11/25/2018 - Shuffling method implemented to shuffle the generated deck created when the user selects option 0 (generating a shuffled deck as opposed to reading deck from a file). </li>
+<li> 11/27/2018 - Created title to enhance the UI Element of the project. </li>
+<li> 11/27/2018 - Added and detailed the strucutred 'skeleton' of the future features to be added into the program. Documeneted all function prototypes and parameters expected as input and output of the functions. </li>
 </ul>
 
 <h1> Construction Documentation </h1>
