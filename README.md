@@ -1,5 +1,5 @@
 # GoFish
-Final Project for ECE175
+Final Project for ECE175.
 
 <h1> Directory </h1>
 
