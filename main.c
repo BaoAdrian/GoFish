@@ -41,7 +41,8 @@ void print_formatted_list(card *card); // Prints unicode characters instead of w
 /* NOTE: Return type of some functions has been undecided and may change in the future */
 /* NOTE (#2): void entered as parameter just to silence the warnings */
 
-void generate_hand(/* Generates a single hand (LinkedList), emulating similar behavior to add_to_end() function */ void);
+card* deleteMember(card *p, card **hl, card **hr);
+void generate_hand(card *deck_hl, card **player1_hl, card **player1_hr);
 void transfer_cards(/* Function that will remove Card Struct(s) from a users hand and add to another players hand */ void);
 void go_fish(/* Function that will add a single card from the pool into the players hand who receives the 'GoFish'. */void);
 int check_for_winner(/* Function that will return a 0 or 1 if any player in the "field" has an empty hand. */void);
@@ -73,8 +74,15 @@ int main(void) {
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     
     // Declare head and tail pointer to keep track of each end of the list
-    card *hl = NULL;
-    card *hr = NULL;
+    card *deck_hl = NULL;
+    card *deck_hr = NULL;
+    
+    
+    // Players hands
+    card *player1_hl = NULL;
+    card *player1_hr = NULL;
+    card *player2_hl = NULL;
+    card *player2_hr = NULL;
     
     // Get user selection: use shuffled deck(0) or use preformatted file input (1)
     deck_init = get_init_deck();
@@ -97,16 +105,16 @@ int main(void) {
                 } else if (suits[j] == 's') {
                     strcpy(temp_card->suit, "spades");
                 }
-                add_to_end(hr, &hl, &hr, temp_card);
+                add_to_end(deck_hr, &deck_hl, &deck_hr, temp_card);
             }
         }
         
         // Print before swap
         printf("GENERATED DECK: \n");
-        print_formatted_list(hl);
+        print_formatted_list(deck_hl);
         
         // Shuffled deck by passing just the head of the LinkedList
-        shuffle_deck(hl);
+        shuffle_deck(deck_hl);
         
         printf("\n\nSHUFFLED DECK: \n");
         
@@ -122,7 +130,7 @@ int main(void) {
         while (fgets(line, LINE_SIZE, inp) != NULL) {
             card *temp_card = (card*)malloc(sizeof(card));
             temp_card = pull_card_data(line); // Parse data from line
-            add_to_end(hr, &hl, &hr, temp_card);
+            add_to_end(deck_hr, &deck_hl, &deck_hr, temp_card);
         }
         
         printf("\nDECK FROM FILE: \n");
@@ -130,10 +138,42 @@ int main(void) {
     
     
     // Print after swapping first two values
-    print_formatted_list(hl);
-    
+    print_formatted_list(deck_hl);
     
     printf("\n\nRest of this project is under construction. Come back soon!\n\n");
+    
+    /************************************************************************
+     * Generating player decks portion                                      *
+     ************************************************************************/
+    
+    printf("ORIGINAL POOL\n");
+    print_formatted_list(deck_hl);
+    
+    
+    for (int i = 0; i < 7; i++) {
+        card *card_to_transfer = (card*)malloc(sizeof(card));
+        card_to_transfer = deleteMember(deck_hr, &deck_hl, &deck_hr);
+        add_to_end(player1_hr, &player1_hl, &player1_hr, card_to_transfer);
+    }
+    
+    
+    for (int i = 0; i < 7; i++) {
+        card *card_to_transfer = (card*)malloc(sizeof(card));
+        card_to_transfer = deleteMember(deck_hr, &deck_hl, &deck_hr);
+        add_to_end(player2_hr, &player2_hl, &player2_hr, card_to_transfer);
+    }
+    
+    printf("\n\nNEW DECK:\n");
+    print_formatted_list(deck_hl);
+    
+    printf("\n\nPLAYER 1 HAND: \n");
+    print_formatted_list(player1_hl);
+    
+    printf("\n\nPLAYER 2 HAND: \n");
+    print_formatted_list(player2_hl);
+    
+    
+    
     
     return 0;
 }
@@ -425,12 +465,28 @@ void print_formatted_list(card *p) {
 /* Rest of the Project to be completed below */
 /*********************************************/
 
-void generate_hand() {
+card* deleteMember(card *p, card **hl, card **hr) {
+    if (p == *hl)         // if deleting the first element
+        *hl = p->next;     // update the left headp
+    else
+        p->prev->next = p->next;
+    if (p == *hr)
+        *hr = p->prev;     // if deleting the last element
+    else
+        p->next->prev = p->prev;
+    return p;
+}
+
+
+void generate_hand(card *deck_hr, card **player_hl, card **player_hr) {
     /*
      * This process will be repeated a specific number of times depending on the amount of players
      * currently playing. Another limitation will be how many card the players receive which also
      * depends on the number of players currently in the game.
      */
+    
+    
+    
 }
 
 void transfer_cards() {
