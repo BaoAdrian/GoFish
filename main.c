@@ -27,7 +27,9 @@ typedef struct card_s {
 
 /* Function Prototypes */
 void print_title(void);
-int get_init_deck(void);
+int get_deck_selection(void);
+void generate_random_deck(card **deck_hl, card **deck_hr);
+void read_in_deck(card **deck_hl, card **hr);
 void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
 card* pull_card_data(char line[]); // Parse line from file into Card Struct
 void shuffle_deck(card *hl);
@@ -43,6 +45,7 @@ void print_formatted_list(card *card); // Prints unicode characters instead of w
 
 card* deleteMember(card *p, card **hl, card **hr);
 void generate_hand(card *deck_hl, card **player1_hl, card **player1_hr);
+void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
 void transfer_cards(/* Function that will remove Card Struct(s) from a users hand and add to another players hand */ void);
 void go_fish(/* Function that will add a single card from the pool into the players hand who receives the 'GoFish'. */void);
 int check_for_winner(/* Function that will return a 0 or 1 if any player in the "field" has an empty hand. */void);
@@ -70,7 +73,6 @@ int main(void) {
     srand((int)time(NULL));
     
     /* Variable Declarations */
-    char line[LINE_SIZE];
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     
     // Declare head and tail pointer to keep track of each end of the list
@@ -85,31 +87,13 @@ int main(void) {
     card *player2_hr = NULL;
     
     // Get user selection: use shuffled deck(0) or use preformatted file input (1)
-    deck_init = get_init_deck();
+    deck_init = get_deck_selection();
     
     
     if (deck_init == 0) {
-        char suits[4] = {'h', 'd', 'c', 's'};
         
-        // Construct a standard sequential deck then shuffle it 200 times
-        for (int i = 1; i <= 13; i++) {
-            for (int j = 0; j < 4; j++) {
-                card *temp_card = (card*)malloc(sizeof(card));
-                temp_card->value = i;
-                if (suits[j] == 'h') {
-                    strcpy(temp_card->suit, "hearts");
-                } else if (suits[j] == 'd') {
-                    strcpy(temp_card->suit, "diamonds");
-                } else if (suits[j] == 'c') {
-                    strcpy(temp_card->suit, "clubs");
-                } else if (suits[j] == 's') {
-                    strcpy(temp_card->suit, "spades");
-                }
-                add_to_end(deck_hr, &deck_hl, &deck_hr, temp_card);
-            }
-        }
+        generate_random_deck(&deck_hl, &deck_hr);
         
-        // Print before swap
         printf("GENERATED DECK: \n");
         print_formatted_list(deck_hl);
         
@@ -117,28 +101,20 @@ int main(void) {
         shuffle_deck(deck_hl);
         
         printf("\n\nSHUFFLED DECK: \n");
+        print_formatted_list(deck_hl);
         
     } else if (deck_init == 1) {
-        // Load deck from preformatted file
-        FILE *inp;
-        inp = fopen("ordered_deck.txt", "r");
-        if (inp == NULL) {
-            printf("ERROR: Could not open file. Ending Program\n");
-            return -1;
-        }
         
-        while (fgets(line, LINE_SIZE, inp) != NULL) {
-            card *temp_card = (card*)malloc(sizeof(card));
-            temp_card = pull_card_data(line); // Parse data from line
-            add_to_end(deck_hr, &deck_hl, &deck_hr, temp_card);
-        }
+        read_in_deck(&deck_hl, &deck_hr);
         
         printf("\nDECK FROM FILE: \n");
+        print_formatted_list(deck_hl);
+        
     }
     
     
-    // Print after swapping first two values
-    print_formatted_list(deck_hl);
+    
+   
     
     printf("\n\nRest of this project is under construction. Come back soon!\n\n");
     
@@ -149,19 +125,8 @@ int main(void) {
     printf("ORIGINAL POOL\n");
     print_formatted_list(deck_hl);
     
-    
-    for (int i = 0; i < 7; i++) {
-        card *card_to_transfer = (card*)malloc(sizeof(card));
-        card_to_transfer = deleteMember(deck_hr, &deck_hl, &deck_hr);
-        add_to_end(player1_hr, &player1_hl, &player1_hr, card_to_transfer);
-    }
-    
-    
-    for (int i = 0; i < 7; i++) {
-        card *card_to_transfer = (card*)malloc(sizeof(card));
-        card_to_transfer = deleteMember(deck_hr, &deck_hl, &deck_hr);
-        add_to_end(player2_hr, &player2_hl, &player2_hr, card_to_transfer);
-    }
+    // create_player_hands(card *deck_hl, card *deck_hr, card *p1_hl, card *p1_hr, card *p2_hl, card *p2_hr, card **p1_hl, card** p1_hr, card **p2_hl, card **p2_hr)
+    create_player_hands(&deck_hl, &deck_hr, &player1_hl, &player1_hr, &player2_hl, &player2_hr);
     
     printf("\n\nNEW DECK:\n");
     print_formatted_list(deck_hl);
@@ -207,27 +172,72 @@ void print_title() {
 
 
 /************************************************************************
- * get_init_deck(): Function that returns the binary choice (0 or 1)    *
+ * get_deck_selection(): Function that returns the binary choice (0/1)  *
  *      that the user selected as the deck generation method.           *
  *                                                                      *
  * Parameters - None                                                    *
  ************************************************************************/
-int get_init_deck(void) {
+int get_deck_selection(void) {
     
-    int deck_init;
+    int deck_selection;
     
     printf("Would you like a shuffled deck (0) or a deck provided from a file (1)? Please choose 0 or 1: ");
-    scanf("%d", &deck_init);
+    scanf("%d", &deck_selection);
     
     // Loop until valid delection is made
-    while (deck_init != 0 && deck_init != 1) {
+    while (deck_selection != 0 && deck_selection != 1) {
         printf("\nERROR, that is not a valid selection.\n");
         printf("Would you like a shuffled deck (0) or a deck provided from a file (1)? Please choose 0 or 1: ");
-        scanf("%d", &deck_init);
+        scanf("%d", &deck_selection);
     }
     
-    return deck_init;
+    return deck_selection;
     
+}
+
+
+void generate_random_deck(card **deck_hl, card **deck_hr) {
+    
+    char suits[4] = {'h', 'd', 'c', 's'};
+    
+    // Construct a standard sequential deck then shuffle it 200 times
+    for (int i = 1; i <= 13; i++) {
+        for (int j = 0; j < 4; j++) {
+            card *temp_card = (card*)malloc(sizeof(card));
+            temp_card->value = i;
+            if (suits[j] == 'h') {
+                strcpy(temp_card->suit, "hearts");
+            } else if (suits[j] == 'd') {
+                strcpy(temp_card->suit, "diamonds");
+            } else if (suits[j] == 'c') {
+                strcpy(temp_card->suit, "clubs");
+            } else if (suits[j] == 's') {
+                strcpy(temp_card->suit, "spades");
+            }
+            add_to_end(*deck_hr, deck_hl, deck_hr, temp_card);
+        }
+    }
+}
+
+
+void read_in_deck(card **deck_hl, card **deck_hr) {
+    
+    
+    char line[LINE_SIZE];
+    
+    // Load deck from preformatted file
+    FILE *inp;
+    inp = fopen("ordered_deck.txt", "r");
+    if (inp == NULL) {
+        printf("ERROR: Could not open file. Ending Program\n");
+        exit(-1);
+    }
+    
+    while (fgets(line, LINE_SIZE, inp) != NULL) {
+        card *temp_card = (card*)malloc(sizeof(card));
+        temp_card = pull_card_data(line); // Parse data from line
+        add_to_end(*deck_hr, deck_hl, deck_hr, temp_card);
+    }
 }
 
 
@@ -465,6 +475,16 @@ void print_formatted_list(card *p) {
 /* Rest of the Project to be completed below */
 /*********************************************/
 
+
+
+
+
+/************************************************************************
+ * delete_member() Function that accepts the pointer and addresses,     *
+ *      similar to the add_to_end function, and removes a card at that  *
+ *      pointer p is pointing to. Makes the necessary adjustments to    *
+ *      LinkedList pointers and returns the card removed from the list. *
+ ************************************************************************/
 card* deleteMember(card *p, card **hl, card **hr) {
     if (p == *hl)         // if deleting the first element
         *hl = p->next;     // update the left headp
@@ -475,6 +495,37 @@ card* deleteMember(card *p, card **hl, card **hr) {
     else
         p->next->prev = p->prev;
     return p;
+}
+
+
+/************************************************************************
+ * create_player_hand(): Function that generates the hands for players  *
+ *      with the use of double pointers allowing us to make adjustments *
+ *      within the various function calls and update the players hands  *
+ *      as well as the pool of cards all within this function.          *
+ * Logic - Uses a for loop that iterates 7 times, dealing cards to each *
+ *      player, one at a time, removing from the pool LinkedList and    *
+ *      adding to the player hands LinkedList.                          *
+ ************************************************************************/
+void create_player_hands(card **deck_hl, card **deck_hr, card **player1_hl, card **player1_hr, card **player2_hl, card **player2_hr) {
+    
+    for (int i = 0; i < 7; i++) {
+        // Remove 1 card from top of pool (head-left of the deck)
+        card *p1_card = (card*)malloc(sizeof(card));
+        p1_card = deleteMember(*deck_hl, deck_hl, deck_hr);
+        
+        // Add to player 1's hand
+        add_to_end(*player1_hr, player1_hl, player1_hr, p1_card);
+        
+        // Remove 1 card from top of pool (head-left of the deck)
+        card *p2_card = (card*)malloc(sizeof(card));
+        p2_card = deleteMember(*deck_hl, deck_hl, deck_hr);
+        
+        // Add to player 2's hand
+        add_to_end(*player2_hr, player2_hl, player2_hr, p2_card);
+        
+    }
+    
 }
 
 
