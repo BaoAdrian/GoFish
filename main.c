@@ -16,6 +16,7 @@
 const int LINE_SIZE = 15;
 const int SUIT_LENGTH = 10;
 const int NUM_OF_SWAPS = 200;
+const int GUESS_SIZE = 5;
 
 /* Card declaration */
 typedef struct card_s {
@@ -39,19 +40,16 @@ void swap(card *pt, int i, int j); // Function used to swap cards at index i and
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
 
-/* Skeleton for the remaining project - Function Prototypes */
-/* NOTE: Return type of some functions has been undecided and may change in the future */
-/* NOTE (#2): void entered as parameter just to silence the warnings */
-
-card* deleteMember(card *p, card **hl, card **hr);
-void generate_hand(card *deck_hl, card **player1_hl, card **player1_hr);
+card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
-void transfer_cards(/* Function that will remove Card Struct(s) from a users hand and add to another players hand */ void);
-void go_fish(/* Function that will add a single card from the pool into the players hand who receives the 'GoFish'. */void);
-int check_for_winner(/* Function that will return a 0 or 1 if any player in the "field" has an empty hand. */void);
-int check_for_book(/* Will be called whenever a transfer occurs to see if the cards transferred complete a book. */void);
-void remove_book(/* Will be called when a book is detected. Will free the memory used by the completed book as they are not needed anymore. */void);
-int process_guess(/* Will return 0 or 1 depending on if the user's guess is contained in the opposing players hand. */void);
+int check_for_book(card *hl);
+int convert_guess(char guess[]);
+void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
+void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr);
+int check_for_winner(card *p1_hl, card *p2_hl);
+
+void remove_book(int rank, card **player_hl, card **player_hr);
+int process_guess(int guess_rank, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
 
 
 /*
@@ -74,6 +72,9 @@ int main(void) {
     
     /* Variable Declarations */
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
+    int players_turn = 1; // Binary 1 or 2 that alternates at each players turn
+    char guess[GUESS_SIZE];
+    int guess_rank;
     
     // Declare head and tail pointer to keep track of each end of the list
     card *deck_hl = NULL;
@@ -97,7 +98,6 @@ int main(void) {
         printf("GENERATED DECK: \n");
         print_formatted_list(deck_hl);
         
-        // Shuffled deck by passing just the head of the LinkedList
         shuffle_deck(deck_hl);
         
         printf("\n\nSHUFFLED DECK: \n");
@@ -111,10 +111,6 @@ int main(void) {
         print_formatted_list(deck_hl);
         
     }
-    
-    
-    
-   
     
     printf("\n\nRest of this project is under construction. Come back soon!\n\n");
     
@@ -134,11 +130,97 @@ int main(void) {
     printf("\n\nPLAYER 1 HAND: \n");
     print_formatted_list(player1_hl);
     
-    printf("\n\nPLAYER 2 HAND: \n");
+    printf("PLAYER 2 HAND: \n");
     print_formatted_list(player2_hl);
     
     
     
+    /************************************************************************
+     * Game Functionality Implementation                                    *
+     ************************************************************************/
+    printf("\n");
+    
+    // First, we must check to see if the cards that were dealt give a player a book
+    // (highly unlikely) but necessary nonetheless.
+    int book_value = check_for_book(player1_hl);
+    if (book_value != 0) {
+        printf("BOOK DETECTED\n");
+        // Remove book that contains value book_value
+        remove_book(book_value, &player1_hl, &player1_hr);
+    } else {
+        printf("NO BOOK DETECTED\n");
+        // Proceed
+    }
+    book_value = check_for_book(player2_hl);
+    if (book_value != 0) {
+        printf("BOOK DETECTED\n");
+        // Remove book that contains value book_value
+        remove_book(book_value, &player2_hl, &player2_hr);
+    } else {
+        printf("NO BOOK DETECTED\n");
+        // Proceed
+    }
+    
+    
+    
+    // Player 1 will play first, they will perform a query on the opposing players hand
+    // If the opposing player contains the rank they guess, they must surrender all cards
+    // of that rank.
+    
+    /*
+     * NOTE: Player1 -> turn = 1
+     *       Player2 -> turn = 2
+     */
+    
+    // Play until a winner is detected
+    while(check_for_winner(player1_hl, player2_hl) != 1) {
+
+        if (players_turn == 1) {
+            // Player 1 goes
+            printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+            printf("Guess: ");
+            scanf("%s", guess);
+
+            guess_rank = convert_guess(guess);
+            
+            if (process_guess(guess_rank, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
+                // Card was found and moved, maintain turn
+                players_turn = 1;
+            } else {
+                players_turn = 2;
+            }
+            
+        } else if (players_turn == 2) {
+            // Player 2 goes
+            printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+            printf("Guess: ");
+            scanf("%s", guess);
+            
+            guess_rank = convert_guess(guess);
+            
+            if (process_guess(guess_rank, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
+                // Card was found and moved, maintain turn
+                players_turn = 2;
+            } else {
+                players_turn = 1;
+            }
+            
+        }
+        
+        // Print hands after each turn
+        printf("\n\nPLAYER 1 HAND: \n");
+        print_formatted_list(player1_hl);
+        
+        printf("PLAYER 2 HAND: \n");
+        print_formatted_list(player2_hl);
+
+    }
+    
+    printf("WE HAVE A WINNER!");
+    
+    
+    
+
     
     return 0;
 }
@@ -196,6 +278,12 @@ int get_deck_selection(void) {
 }
 
 
+/************************************************************************
+ * generate_random_deck() Function that generates a random deck cycling *
+ *      through suits and ranks using nested for loops. This generates  *
+ *      an ordered deck so it is then passed to the shuffle method to   *
+ *      essentially generate a randomly generated deck.                 *
+ ************************************************************************/
 void generate_random_deck(card **deck_hl, card **deck_hr) {
     
     char suits[4] = {'h', 'd', 'c', 's'};
@@ -220,6 +308,11 @@ void generate_random_deck(card **deck_hl, card **deck_hr) {
 }
 
 
+/************************************************************************
+ * read_in_deck(): Function that will attempt to read a file that is    *
+ *      formatted in a specfic way so that the function can parse the   *
+ *      line and populate a deck of 52 cards.                           *
+ ************************************************************************/
 void read_in_deck(card **deck_hl, card **deck_hr) {
     
     
@@ -233,11 +326,13 @@ void read_in_deck(card **deck_hl, card **deck_hr) {
         exit(-1);
     }
     
+    // Loop through file reading and parsing contents line by line
     while (fgets(line, LINE_SIZE, inp) != NULL) {
         card *temp_card = (card*)malloc(sizeof(card));
         temp_card = pull_card_data(line); // Parse data from line
         add_to_end(*deck_hr, deck_hl, deck_hr, temp_card);
     }
+    
 }
 
 
@@ -471,6 +566,9 @@ void print_formatted_list(card *p) {
     printf("NULL\n");
 }
 
+
+
+
 /*********************************************/
 /* Rest of the Project to be completed below */
 /*********************************************/
@@ -485,7 +583,7 @@ void print_formatted_list(card *p) {
  *      pointer p is pointing to. Makes the necessary adjustments to    *
  *      LinkedList pointers and returns the card removed from the list. *
  ************************************************************************/
-card* deleteMember(card *p, card **hl, card **hr) {
+card* remove_member(card *p, card **hl, card **hr) {
     if (p == *hl)         // if deleting the first element
         *hl = p->next;     // update the left headp
     else
@@ -512,14 +610,14 @@ void create_player_hands(card **deck_hl, card **deck_hr, card **player1_hl, card
     for (int i = 0; i < 7; i++) {
         // Remove 1 card from top of pool (head-left of the deck)
         card *p1_card = (card*)malloc(sizeof(card));
-        p1_card = deleteMember(*deck_hl, deck_hl, deck_hr);
+        p1_card = remove_member(*deck_hl, deck_hl, deck_hr);
         
         // Add to player 1's hand
         add_to_end(*player1_hr, player1_hl, player1_hr, p1_card);
         
         // Remove 1 card from top of pool (head-left of the deck)
         card *p2_card = (card*)malloc(sizeof(card));
-        p2_card = deleteMember(*deck_hl, deck_hl, deck_hr);
+        p2_card = remove_member(*deck_hl, deck_hl, deck_hr);
         
         // Add to player 2's hand
         add_to_end(*player2_hr, player2_hl, player2_hr, p2_card);
@@ -529,62 +627,205 @@ void create_player_hands(card **deck_hl, card **deck_hr, card **player1_hl, card
 }
 
 
-void generate_hand(card *deck_hr, card **player_hl, card **player_hr) {
-    /*
-     * This process will be repeated a specific number of times depending on the amount of players
-     * currently playing. Another limitation will be how many card the players receive which also
-     * depends on the number of players currently in the game.
-     */
+/************************************************************************
+ * convert_guess(): Function that will accept a user query in the form  *
+ *      of a string and convert it to its integer equivalent.           *
+ ************************************************************************/
+int convert_guess(char guess[]) {
     
+    // Will convert the A, J, Q, K inputs to their respective rank values
+    // If value 2-10 entered, will return the integer equivalent
+    if (strcmp(guess, "A") == 0) {
+        return 1;
+    } else if (strcmp(guess, "J") == 0) {
+        return 11;
+    } else if (strcmp(guess, "Q") == 0) {
+        return 12;
+    } else if (strcmp(guess, "K") == 0) {
+        return 13;
+    } else {
+        return atoi(guess);
+    }
     
+}
+
+
+
+
+
+/************************************************************************
+ * check_for_winner(): Function that checks to see if either of the     *
+ *      players hands has a length of zero, if so, that indicates that  *
+ *      a hand is empty and a winner has been found.                    *
+ *      Returns 1 if winner is detected, 0 otherwise.                   *
+ ************************************************************************/
+int check_for_winner(card *p1_hl, card *p2_hl) {
+    if ((find_length(p1_hl) == 0) || (find_length(p2_hl) == 0)) {
+        // One of the hands is empty, therefore a player has won, return 1
+        return 1;
+    } else {
+        // No winner found, return 0
+        return 0;
+    }
+}
+
+
+/************************************************************************
+ * check_for_book(): Function that will traverse the LinkedList of the  *
+ *      list passed in and search for a rank that occurs 4 times in the *
+ *      hand, i.e. a book. If one is found, it will return the value    *
+ *      of the book that was found, otherwise, it will return 0.        *
+ ************************************************************************/
+int check_for_book(card *hl) {
+    // Create array of size List Length
+    int length = find_length(hl);
+    int count = 0;
+    int occurrence_array[length];
+    
+    // populate array with values
+    card *temp = (card*)malloc(sizeof(card));
+    temp = hl;
+    
+    for (int i = 0; i < length; i++) {
+        occurrence_array[i] = temp->value;
+        temp = temp->next;
+    }
+    
+    // Reset temp and iterate through the list
+    for (int i = 0; i < length; i++) {
+        count = 0;
+        temp = hl;
+        while (temp != NULL) {
+            if (temp->value == occurrence_array[i]) {
+                count++;
+            }
+            if (count == 4) {
+                // Return actual value of the book
+                return temp->value;
+            }
+            temp = temp->next;
+        }
+    }
+    // If reached this point, no book was found, return 0
+    return 0;
+}
+
+
+/************************************************************************
+ * process_guess(): Function that accepts a guess_rank and traverses    *
+ *      the opponents hand searching for any cards that share that same *
+ *      rank. If so, keeps a count so that all cards of that rank can   *
+ *      be transferred from opponent's hand to the guesser's hand.      *
+ ************************************************************************/
+int process_guess(int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr, card **deck_hl, card **deck_hr) {
+   
+    // Iterate through the list and see if rank exists in hand, if so, how many.
+    int num_of_cards = 0;
+    int book_value;
+    
+    card *temp = (card*)malloc(sizeof(card));
+    
+    temp = *opp_hl;
+    while (temp != NULL) {
+        if (temp->value == guess_rank) {
+            num_of_cards++;
+        }
+        temp = temp->next;
+    }
+    
+    /* Verified up to this point */
+    
+    // Now we check to see if any cards exist
+    if (num_of_cards > 0) {
+        // There is a card that needs to be transfered from opponenets deck to guessers deck
+        transfer_cards(num_of_cards, guess_rank, guesser_hl, guesser_hr, opp_hl, opp_hr);
+        book_value = check_for_book(*guesser_hl);
+        if (book_value != 0) {
+            remove_book(book_value, guesser_hl, guesser_hr);
+        }
+        return 1;
+    } else {
+        // Card was not found, therefore, GOFISH occurs
+        printf("NOPE! GO FISH!\n");
+        go_fish(guesser_hl, guesser_hr, deck_hl, deck_hr);
+        book_value = check_for_book(*guesser_hl);
+        if (book_value != 0) {
+            remove_book(book_value, guesser_hl, guesser_hr);
+        }
+        return 0;
+    }
     
 }
 
-void transfer_cards() {
-    /*
-     * This function will be used when the user processes a query, i.e. makes a guess. If the other
-     * opposing player contains a card that the user requested, a transfer must occur where all cards
-     * matching that rank will be transferred from the opposing players hand to the guessing players hand
-     */
+
+/************************************************************************
+ * transfer_cards(): Function that is called when a transfer needs to   *
+ *      occur. Will traverse the opponents hand, num_of_cards number of *
+ *      times since that is how many cards need to be transferred. The  *
+ *      cards will be removed from opponents hand and added to the      *
+ *      guessers hand.                                                  *
+ ************************************************************************/
+void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr) {
+    
+    // Loop through to get the number of cards present in users hand
+    for (int i = 0; i < num_of_cards; i++) {
+        
+        // Traverse list, finding the cards, removing it, and adding to guessers hand
+        card *temp = (card*)malloc(sizeof(card));
+        temp = *opp_hl;
+        
+        while (temp != NULL) {
+            if (temp->value == guess_rank) {
+                // Remove this card and add to guessers hand
+                add_to_end(*guesser_hr, guesser_hl, guesser_hr, remove_member(temp, opp_hl, opp_hr));
+            }
+            temp = temp->next;
+        }
+        
+    }
+    
+    // Now player two no longer possesses any card of rank, guess_rank.
+    // Guessing player now possesses all cards of rank, guess_rank, that opponent once had
+    
 }
 
-void go_fish() {
-    /*
-     * This function will be used when the user processes a query on an opposing players hand and the
-     * opposing player does not contain any card of that rank in their hand. In this case, this function
-     * will remove a card from the pool of cards and add to the guessing player's hand.
-     */
+
+/************************************************************************
+ * go_fish(): Function that will be called when a player who guesses    *
+ *      for a card that does not exist in the other players hand. When  *
+ *      called, will remove the top card from the deck and add to the   *
+ *      guessers hand.                                                  *
+ ************************************************************************/
+void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr) {
+    card *drawn_card = (card*)malloc(sizeof(card));
+    drawn_card = remove_member(*deck_hl, deck_hl, deck_hr);
+    add_to_end(*guesser_hr, guesser_hl, guesser_hr, drawn_card);
 }
 
-int check_for_winner() {
-    /*
-     * This function will be used to see if any of the player's hands are currently pointing to NULL
-     * if that is the case, then they do not possess any cards anymore and have won the game.
-     */
-    return 0; // temporary
+
+/************************************************************************
+ * remove_book(): Function that accepts a specific rank to remove from  *
+ *      the players hand. The rank is the value of the card that        *
+ *      completes the book that will be removed.                        *
+ ************************************************************************/
+void remove_book(int rank, card **player_hl, card **player_hr) {
+    
+    // Iterate 4 times (4 is the amount of a completed book)
+    for (int i = 0; i < 4; i++) {
+        
+        // Traverse the hand and remove the card with value of rank
+        card *temp = (card*)malloc(sizeof(card));
+        temp = *player_hl;
+        
+        while (temp != NULL) {
+            if (temp->value == rank) {
+                // Remove this card
+                free(remove_member(temp, player_hl, player_hr)); // Free memory taken by the card (no longer needed)
+                break;
+            }
+            temp = temp->next;
+        }
+    }
 }
 
-int check_for_book() {
-    /*
-     * This function will be used whenever a transfer or GoFish occurs. When a new card is introduced into
-     * someones deck, then this function will check to see if the card added completes a book. If so,
-     * it returns 1, else it returns 0.
-     */
-    return 0; // temporary
-}
 
-void remove_book() {
-    /*
-     * This function will be called when a book is detected and will remove all cards of the rank completing the book and
-     * free the memory allocated by the card
-     */
-}
-
-int process_guess() {
-    /*
-     * This function will be called whenever a player is guessing a specific rank to another opposing player.
-     * It will check to see if their hand contains the rank they are searching for and returns 1 if so, otherwise
-     * it returns 0.
-     */
-    return 0; // temporary
-}
