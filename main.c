@@ -32,6 +32,13 @@ typedef struct card_s {
 
 /* Function Prototypes */
 void print_title(void);
+void print_list(card *card);
+void print_formatted_list(card *card); // Prints unicode characters instead of words
+void print_go_fish(void);
+void print_hand(card *hl);
+void print_leftside_card(card *card);
+void print_rightside_card(card *card);
+
 int get_deck_selection(void);
 void generate_random_deck(card **deck_hl, card **deck_hr);
 void read_in_deck(card **deck_hl, card **hr);
@@ -41,24 +48,19 @@ void shuffle_deck(card *hl);
 int find_length(card *hl);
 int rand_gen(int count);
 void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
-void print_list(card *card);
-void print_formatted_list(card *card); // Prints unicode characters instead of words
-void print_hand(card *hl);
-void print_leftside_card(card *card);
-void print_rightside_card(card *card);
-
-
 card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
-int check_for_book(card *hl);
+int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card **player1_hr, card **player2_hl, card **player2_hr, card **deck_hl, card **deck_hr);
+int validate_guess(char *guess);
 int convert_guess(char guess[]);
 char convert_rank(int rank);
+int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
+int check_for_book(card *hl);
+int process_guess(int guesser, int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
 void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
 void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr);
-int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
-
 void remove_book(int rank, card **player_hl, card **player_hr);
-int process_guess(int guesser, int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
+
 
 
 /*
@@ -83,8 +85,6 @@ int main(void) {
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     int players_turn = 1; // Binary 1 or 2 that alternates at each players turn
     int flag = 0;
-    char guess[GUESS_SIZE];
-    int guess_rank;
     
     // Declare head and tail pointer to keep track of each end of the list
     card *deck_hl = NULL;
@@ -105,7 +105,7 @@ int main(void) {
     // Get user selection: use shuffled deck(0) or use preformatted file input (1)
     deck_init = get_deck_selection();
     
-    
+    // Generate deck based on selectiong
     if (deck_init == 0) {
         
         generate_random_deck(&deck_hl, &deck_hr);
@@ -144,12 +144,12 @@ int main(void) {
     print_hand(player2_hl);
     
     
+    // Start the Gameplay
     printf("\n\n*********************************\n");
     printf("* LET'S BEGIN!                  *\n");
     printf("*********************************\n\n");
     
-    // First, we must check to see if the cards that were dealt give a player a book
-    // (highly unlikely) but necessary nonetheless.
+    // First check highly unlikely case where a player is dealt a book at start of game.
     int book_value = check_for_book(player1_hl);
     if (book_value != 0) {
         // Book Detected, remove and increment score
@@ -169,7 +169,7 @@ int main(void) {
     
     
     
-    // Play until a winner is detected
+    // Now loop until a winner is declared
     while(check_for_winner(player1_hl, player2_hl, deck_hl) != 1) {
         
         // Check the hands to ensure the game is still playable or break out if game is over
@@ -208,43 +208,21 @@ int main(void) {
             flag = 0; // Reset flag to playable state
         } else {
             if (players_turn == PLAYER_ONE) {
-                // Player 1 goes
-                printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
-                printf("Guess: ");
-                scanf("%s", guess);
-                guess_rank = convert_guess(guess);
-                
-                if (process_guess(players_turn, guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
-                    // Card was found and moved, maintain turn
-                    players_turn = PLAYER_ONE;
-                } else {
-                    players_turn = PLAYER_TWO;
-                }
-                
+                // Execute entire processing of a guess within this function call
+                players_turn = guess_a_card(players_turn, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr);
             } else if (players_turn == PLAYER_TWO) {
-                // Player 2 goes
-                printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
-                printf("Guess: ");
-                scanf("%s", guess);
-                
-                guess_rank = convert_guess(guess);
-                
-                if (process_guess(players_turn, guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
-                    // Card was found and moved, maintain turn
-                    players_turn = PLAYER_TWO;
-                } else {
-                    players_turn = PLAYER_ONE;
-                }
+                // Execute entire processing of a guess within this function call
+                players_turn = guess_a_card(players_turn, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr);
             }
         }
         
         // Print hands after each turn
-        printf("*********************************\n");
+        printf("\n*********************************\n");
         printf("* PLAYER 1 HAND:                *\n");
         printf("*********************************\n");
         print_hand(player1_hl);
         
-        printf("*********************************\n");
+        printf("\n*********************************\n");
         printf("* PLAYER 2 HAND:                *\n");
         printf("*********************************\n");
         print_hand(player2_hl);
@@ -256,10 +234,6 @@ int main(void) {
     printf("\n\nGAME OVER! LETS TALLY UP THE SCORES\n\n");
     printf("Player 1: %d\n", *p1_score_ptr);
     printf("Player 2: %d\n", *p2_score_ptr);
-    
-    
-    
-
     
     return 0;
 }
@@ -302,9 +276,188 @@ void print_go_fish() {
     printf("><((('> |      |\\  |     |    |        |        |  |    |   | |   ><((('>\n");
     printf("><((('>  \\____/    |_____|    |      __|__ _____|  |    |   o o   ><((('>\n");
     printf("><((('>                                                           ><((('>\n");
-    printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
+    printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
 }
 
+
+/************************************************************************
+ * print_list(): Standard function that traverses the Linked List and   *
+ *      prints the formatted Card Struct at each stop along the way.    *
+ *      Generic in the formatted output due to no unicode usage.        *
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
+void print_list(card *p) {
+    card *curr = p;
+    while (curr != NULL) {
+        printf("[%d %s] -> ", curr->value, curr->suit);
+        curr = curr->next;
+    }
+    printf("NULL\n");
+}
+
+
+/************************************************************************
+ * print_formatted_list(): Print function that outputs the formatted    *
+ *      values of the struct by converting the suit into their unicode  *
+ *      equivalent.
+ *                                                                      *
+ * Parameters: p - head of the list to be traversed, used as the start  *
+ *      point for the traversal. Iterates until NEXT ptr is NULL        *
+ ************************************************************************/
+void print_formatted_list(card *p) {
+    card *curr = p;
+    while (curr != NULL) {
+        if (strcmp(curr->suit, "hearts") == 0) {
+            printf("[%d \u2665] -> ", curr->value);
+        } else if (strcmp(curr->suit, "diamonds") == 0){
+            printf("[%d \u2666] -> ", curr->value);
+        } else if (strcmp(curr->suit, "spades") == 0){
+            printf("[%d \u2660] -> ", curr->value);
+        } else if (strcmp(curr->suit, "clubs") == 0){
+            printf("[%d \u2663] -> ", curr->value);
+        }
+        curr = curr->next;
+    }
+    printf("NULL\n");
+    
+    free(curr);
+}
+
+
+/************************************************************************
+ * print_hand(): Function that uses a series of while loops to print    *
+ *      the passed-in players hand with formatted graphics and unicode  *
+ *      symbols to represent the suits.                                 *
+ ************************************************************************/
+void print_hand(card *hl) {
+    
+    card *temp = (card*)malloc(sizeof(card));
+    // serves as a flag to maintain pointer to the correct set of cards
+    card *current_start = (card*)malloc(sizeof(card));
+    int length = find_length(hl);
+    int running_length = length;
+    
+    temp = hl;
+    current_start = hl;
+    
+    int i;
+    while (running_length > 0) {
+        i = 0;
+        
+        while (i < CARD_LIMIT && i < running_length) {
+            printf(" -----  ");
+            i++;
+        }
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            print_leftside_card(temp);
+            temp = temp->next;
+            i++;
+        }
+        printf("\n");
+        temp = current_start;
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            printf("|     | ");
+            i++;
+        }
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            print_rightside_card(temp);
+            temp = temp->next;
+            i++;
+        }
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            printf(" -----  ");
+            i++;
+        }
+        printf("\n");
+        
+        running_length = running_length - CARD_LIMIT;
+        current_start = temp;
+        
+    }
+    
+    free(temp);
+    free(current_start);
+    
+}
+
+
+/************************************************************************
+ * print_leftside_card(): Function that is specifically tailored to     *
+ *      correctly print the top left side of the card with rank & suit  *
+ ************************************************************************/
+void print_leftside_card(card *card) {
+    
+    // 10 is the special case since it takes up two spaces
+    if (card->value == 10) {
+        printf("|10");
+        if (strcmp(card->suit, "hearts") == 0) {
+            printf("\u2665  | ");
+        } else if (strcmp(card->suit, "diamonds") == 0) {
+            printf("\u2666  | ");
+        } else if (strcmp(card->suit, "spades") == 0) {
+            printf("\u2660  | ");
+        } else {
+            // Clubs
+            printf("\u2663  | ");
+        }
+    } else {
+        printf("|%c", convert_rank(card->value));
+        if (strcmp(card->suit, "hearts") == 0) {
+            printf("\u2665   | ");
+        } else if (strcmp(card->suit, "diamonds") == 0) {
+            printf("\u2666   | ");
+        } else if (strcmp(card->suit, "spades") == 0) {
+            printf("\u2660   | ");
+        } else {
+            // Clubs
+            printf("\u2663   | ");
+        }
+    }
+    
+    
+    
+}
+
+
+/************************************************************************
+ * print_rightside_card(): Function that is specifically tailored to    *
+ *      correctly print the bottom right of the card with rank & suit   *
+ ************************************************************************/
+void print_rightside_card(card *card) {
+    
+    // |  10\u2665|
+    
+    // 10 is the special case since it takes up two spaces
+    if (card->value == 10) {
+        printf("|  10");
+    } else {
+        printf("|   %c", convert_rank(card->value));
+    }
+    
+    if (strcmp(card->suit, "hearts") == 0) {
+        printf("\u2665| ");
+    } else if (strcmp(card->suit, "diamonds") == 0) {
+        printf("\u2666| ");
+    } else if (strcmp(card->suit, "spades") == 0) {
+        printf("\u2660| ");
+    } else {
+        // Clubs
+        printf("\u2663| ");
+    }
+    
+}
 
 /************************************************************************
  * get_deck_selection(): Function that returns the binary choice (0/1)  *
@@ -580,186 +733,6 @@ void swap(card *pt, int i, int j) {
 
 
 /************************************************************************
- * print_list(): Standard function that traverses the Linked List and   *
- *      prints the formatted Card Struct at each stop along the way.    *
- *      Generic in the formatted output due to no unicode usage.        *
- *                                                                      *
- * Parameters: p - head of the list to be traversed, used as the start  *
- *      point for the traversal. Iterates until NEXT ptr is NULL        *
- ************************************************************************/
-void print_list(card *p) {
-    card *curr = p;
-    while (curr != NULL) {
-        printf("[%d %s] -> ", curr->value, curr->suit);
-        curr = curr->next;
-    }
-    printf("NULL\n");
-}
-
-
-/************************************************************************
- * print_formatted_list(): Print function that outputs the formatted    *
- *      values of the struct by converting the suit into their unicode  *
- *      equivalent.
- *                                                                      *
- * Parameters: p - head of the list to be traversed, used as the start  *
- *      point for the traversal. Iterates until NEXT ptr is NULL        *
- ************************************************************************/
-void print_formatted_list(card *p) {
-    card *curr = p;
-    while (curr != NULL) {
-        if (strcmp(curr->suit, "hearts") == 0) {
-            printf("[%d \u2665] -> ", curr->value);
-        } else if (strcmp(curr->suit, "diamonds") == 0){
-            printf("[%d \u2666] -> ", curr->value);
-        } else if (strcmp(curr->suit, "spades") == 0){
-            printf("[%d \u2660] -> ", curr->value);
-        } else if (strcmp(curr->suit, "clubs") == 0){
-            printf("[%d \u2663] -> ", curr->value);
-        }
-        curr = curr->next;
-    }
-    printf("NULL\n");
-    
-    free(curr);
-}
-
-
-/************************************************************************
- * print_hand(): Function that uses a series of while loops to print    *
- *      the passed-in players hand with formatted graphics and unicode  *
- *      symbols to represent the suits.                                 *
- ************************************************************************/
-void print_hand(card *hl) {
-    
-    card *temp = (card*)malloc(sizeof(card));
-    // serves as a flag to maintain pointer to the correct set of cards
-    card *current_start = (card*)malloc(sizeof(card));
-    int length = find_length(hl);
-    int running_length = length;
-    
-    temp = hl;
-    current_start = hl;
-    
-    int i;
-    while (running_length > 0) {
-        i = 0;
-        
-        while (i < CARD_LIMIT && i < running_length) {
-            printf(" -----  ");
-            i++;
-        }
-        printf("\n");
-        
-        i = 0;
-        while (i < CARD_LIMIT && i < running_length) {
-            print_leftside_card(temp);
-            temp = temp->next;
-            i++;
-        }
-        printf("\n");
-        temp = current_start;
-        i = 0;
-        while (i < CARD_LIMIT && i < running_length) {
-            printf("|     | ");
-            i++;
-        }
-        printf("\n");
-        
-        i = 0;
-        while (i < CARD_LIMIT && i < running_length) {
-            print_rightside_card(temp);
-            temp = temp->next;
-            i++;
-        }
-        printf("\n");
-        
-        i = 0;
-        while (i < CARD_LIMIT && i < running_length) {
-            printf(" -----  ");
-            i++;
-        }
-        printf("\n");
-        
-        running_length = running_length - CARD_LIMIT;
-        current_start = temp;
-        
-    }
-
-    free(temp);
-    free(current_start);
-    
-}
-
-
-/************************************************************************
- * print_leftside_card(): Function that is specifically tailored to     *
- *      correctly print the top left side of the card with rank & suit  *
- ************************************************************************/
-void print_leftside_card(card *card) {
-    
-    // 10 is the special case since it takes up two spaces
-    if (card->value == 10) {
-        printf("|10");
-        if (strcmp(card->suit, "hearts") == 0) {
-            printf("\u2665  | ");
-        } else if (strcmp(card->suit, "diamonds") == 0) {
-            printf("\u2666  | ");
-        } else if (strcmp(card->suit, "spades") == 0) {
-            printf("\u2660  | ");
-        } else {
-            // Clubs
-            printf("\u2663  | ");
-        }
-    } else {
-        printf("|%c", convert_rank(card->value));
-        if (strcmp(card->suit, "hearts") == 0) {
-            printf("\u2665   | ");
-        } else if (strcmp(card->suit, "diamonds") == 0) {
-            printf("\u2666   | ");
-        } else if (strcmp(card->suit, "spades") == 0) {
-            printf("\u2660   | ");
-        } else {
-            // Clubs
-            printf("\u2663   | ");
-        }
-    }
-    
-    
-    
-}
-
-
-/************************************************************************
- * print_rightside_card(): Function that is specifically tailored to    *
- *      correctly print the bottom right of the card with rank & suit   *
- ************************************************************************/
-void print_rightside_card(card *card) {
-    
-    // |  10\u2665|
-    
-    // 10 is the special case since it takes up two spaces
-    if (card->value == 10) {
-        printf("|  10");
-    } else {
-        printf("|   %c", convert_rank(card->value));
-    }
-    
-    if (strcmp(card->suit, "hearts") == 0) {
-        printf("\u2665| ");
-    } else if (strcmp(card->suit, "diamonds") == 0) {
-        printf("\u2666| ");
-    } else if (strcmp(card->suit, "spades") == 0) {
-        printf("\u2660| ");
-    } else {
-        // Clubs
-        printf("\u2663| ");
-    }
-    
-}
-
-
-/************************************************************************
  * delete_member() Function that accepts the pointer and addresses,     *
  *      similar to the add_to_end function, and removes a card at that  *
  *      pointer p is pointing to. Makes the necessary adjustments to    *
@@ -805,6 +778,72 @@ void create_player_hands(card **deck_hl, card **deck_hr, card **player1_hl, card
         add_to_end(*player2_hr, player2_hl, player2_hr, p2_card);
         
     }
+    
+}
+
+
+/************************************************************************
+ * guess_a_card(): Function that is responsible the guessing mechanics  *
+ *      and will prompt user for guess, validate the response, and      *
+ *      call all necessary functions to correctly process that guess    *
+ *      and returns the int value of the Player (1 or 2) that will      *
+ *      continue with the next turn.                                    *
+ ************************************************************************/
+int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card **player1_hr, card **player2_hl, card **player2_hr, card **deck_hl, card **deck_hr) {
+    
+    char guess[GUESS_SIZE];
+    int guess_rank;
+    
+    // Player 1 goes
+    printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+    printf("Guess: ");
+    scanf("%s", guess);
+    
+    while (validate_guess(guess) != 1) {
+        printf("That is not a valid guess. Try Again\n");
+        printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+        printf("Guess: ");
+        scanf("%s", guess);
+    }
+    
+    guess_rank = convert_guess(guess);
+    
+    if (process_guess(players_turn, guess_rank, p1_score_ptr, player1_hl, player1_hr, player2_hl, player2_hr, deck_hl, deck_hr)) {
+        // Card was found and moved, maintain turn
+        if (players_turn == PLAYER_ONE) {
+            return PLAYER_ONE;
+        } else {
+            return PLAYER_TWO;
+        }
+    } else {
+        // Card was not found, switch turns
+        if (players_turn == PLAYER_ONE) {
+            return PLAYER_TWO;
+        } else {
+            return PLAYER_ONE;
+        }
+    }
+    
+}
+
+
+
+
+
+
+
+
+/************************************************************************
+ * validate_guess(): Function that will return 0 or 1 depending on if   *
+ *      the entered guess is a valid one or not.                        *
+ ************************************************************************/
+int validate_guess(char *guess) {
+    
+    if (strcmp(guess, "A") == 0 || strcmp(guess, "2") == 0 || strcmp(guess, "3") == 0 || strcmp(guess, "4") == 0 || strcmp(guess, "5") == 0 || strcmp(guess, "6") == 0 || strcmp(guess, "7") == 0 || strcmp(guess, "8") == 0 || strcmp(guess, "9") == 0 || strcmp(guess, "10") == 0 || strcmp(guess, "J") == 0 || strcmp(guess, "Q") == 0 || strcmp(guess, "K") == 0) {
+        // If any of the above is true, then a valid guess has been entered, return 1
+        return 1;
+    }
+    return 0; // Invalid guess given, return 0
     
 }
 
@@ -956,9 +995,6 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
         return 1;
     } else {
         // Card was not found, therefore, GOFISH occurs
-//        printf("\n*************************************************************\n");
-//        printf("* NOPE! GO FISH!!! CARD IS DRAWN FROM DECK AND ADDED TO HAND\n");
-//        printf("*************************************************************\n");
         print_go_fish();
         go_fish(guesser_hl, guesser_hr, deck_hl, deck_hr);
         book_value = check_for_book(*guesser_hl);
@@ -998,12 +1034,7 @@ void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **
             }
             temp = temp->next;
         }
-        
     }
-    
-    // Now player two no longer possesses any card of rank, guess_rank.
-    // Guessing player now possesses all cards of rank, guess_rank, that opponent once had
-    
 }
 
 
