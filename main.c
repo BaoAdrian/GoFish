@@ -31,14 +31,13 @@ typedef struct card_s {
 } card;
 
 /* Function Prototypes */
-void print_title(void);
+void print_go_fish_title(void);
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
 void print_go_fish(void);
 void print_hand(card *hl);
 void print_leftside_card(card *card);
 void print_rightside_card(card *card);
-
 int get_deck_selection(void);
 void generate_random_deck(card **deck_hl, card **deck_hr);
 void read_in_deck(card **deck_hl, card **hr);
@@ -60,7 +59,7 @@ int process_guess(int guesser, int guess_rank, int **player_score,  card **p1_hl
 void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
 void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr);
 void remove_book(int rank, card **player_hl, card **player_hr);
-
+void declare_winner(int p1_score, int p2_score);
 
 
 /*
@@ -76,7 +75,7 @@ void remove_book(int rank, card **player_hl, card **player_hr);
 int main(void) {
     
     // Print header
-    print_title();
+    print_go_fish_title();
     
     // Seed the RNG
     srand((int)time(NULL));
@@ -231,9 +230,9 @@ int main(void) {
 
     } // end gameplaye whileloop
     
-    printf("\n\nGAME OVER! LETS TALLY UP THE SCORES\n\n");
-    printf("Player 1: %d\n", *p1_score_ptr);
-    printf("Player 2: %d\n", *p2_score_ptr);
+    
+    
+    declare_winner(*p1_score_ptr, *p2_score_ptr);
     
     return 0;
 }
@@ -242,27 +241,48 @@ int main(void) {
 /************************************************************************
  * print_title(): Title to add to the UI Element of the program         *
  ************************************************************************/
-void print_title() {
-    
-    printf("\t\t -----   -----   -----   -----   -----   -----\n");
-    printf("\t\t|A\u2665   | |K\u2665   | |Q\u2665   | |J\u2665   | |10\u2665  | |9\u2665   |\n");
-    printf("\t\t|     | |     | |     | |     | |     | |     |\n");
-    printf("\t\t|   A\u2665| |   K\u2665| |   Q\u2665| |   J\u2665| |  10\u2665| |   9\u2665|\n");
-    printf("\t\t -----   -----   -----   -----   -----   -----\n");
-    
-    //  Prints START
-    printf("\t\t -----    __  _____  ___   ___   _____   -----\n");
-    printf("\t\t|A\u2663   |  |      |   |   | |   |    |    |A\u2663   |\n");
-    printf("\t\t|     |   --    |   |---| | --     |    |     |\n");
-    printf("\t\t|   A\u2663|     |   |   |   | |  \\     |    |   A\u2663|\n");
-    printf("\t\t -----    --    |   |   | |   \\    |     -----\n");
-    
-    printf("\t\t -----   -----   -----   -----   -----   -----\n");
-    printf("\t\t|9\u2660   | |10\u2660  | |J\u2660   | |Q\u2660   | |K\u2660   | |A\u2660   |\n");
-    printf("\t\t|     | |     | |     | |     | |     | |     |\n");
-    printf("\t\t|   9\u2660| |  10\u2660| |   J\u2660| |   Q\u2660| |   K\u2660| |   A\u2660|\n");
-    printf("\t\t -----   -----   -----   -----   -----   -----\n\n");
-
+void print_go_fish_title() {
+    printf("\n><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>");
+    printf("\n><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
+    printf("><((('>    ____     _____      _____ _____  _____                 ><((('>\n");
+    printf("><((('>  /         |     |    |        |   |       |    |   | |   ><((('>\n");
+    printf("><((('> |    ____  |     |    |___     |   |_____  |____|   | |   ><((('>\n");
+    printf("><((('> |      |\\  |     |    |        |        |  |    |   | |   ><((('>\n");
+    printf("><((('>  \\____/    |_____|    |      __|__ _____|  |    |   o o   ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
+    printf("><((('>  ><((('> ~~~ ><((('> ~~~ ><((('> ~~~ ><((('> ~~~ ><((('>  ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
+    printf("><((('>  RULES THAT THIS PROGRAM ABIDES BY:                       ><((('>\n");
+    printf("><((('>  1. At the start of the game, the user may select to      ><((('>\n");
+    printf("><((('>     have a deck generated or read from a file.            ><((('>\n");
+    printf("><((('>  2. Each player (game supports 2 players) will be dealt   ><((('>\n");
+    printf("><((('>     7 cards from the generetaed deck and displayed.       ><((('>\n");
+    printf("><((('>  3. Once the hands of each player are displayed, gameplay ><((('>\n");
+    printf("><((('>     will begin with Player 1 starting the game.           ><((('>\n");
+    printf("><((('>  4. If a book (4 cards of the same rank) is detected in   ><((('>\n");
+    printf("><((('>     a players hand at any point in the game, that book    ><((('>\n");
+    printf("><((('>     will be removed from the players hand and their score ><((('>\n");
+    printf("><((('>     will be incremented.                                  ><((('>\n");
+    printf("><((('>  5. When a player guesses a rank against opponenets hand  ><((('>\n");
+    printf("><((('>     and the opponent holds ANY number of cards containing ><((('>\n");
+    printf("><((('>     that rank, they must surrender the cards to guessing  ><((('>\n");
+    printf("><((('>     player. Guessing player maintains the turn.           ><((('>\n");
+    printf("><((('>  6. When a player guesses a rank against opponents hand   ><((('>\n");
+    printf("><((('>     and the opponent does NOT hold any cards of that rank ><((('>\n");
+    printf("><((('>     GO FISH occurs and the guessing player draws a card   ><((('>\n");
+    printf("><((('>     from the pool. Turn is then switched to opponent      ><((('>\n");
+    printf("><((('>  7. If at any point in the game, one of the players hand  ><((('>\n");
+    printf("><((('>     is empty, i.e. if the guessing player has taken all   ><((('>\n");
+    printf("><((('>     of their cards, then the player must draw one card    ><((('>\n");
+    printf("><((('>     from the pool and the turns are switched.             ><((('>\n");
+    printf("><((('>  8. A winner is declared when either all books have been  ><((('>\n");
+    printf("><((('>     collected or one of the players runs out of cards and ><((('>\n");
+    printf("><((('>     no more cards remain in the pool. The score is then   ><((('>\n");
+    printf("><((('>     tallied and the winner is the player who completed    ><((('>\n");
+    printf("><((('>     the most books.                                       ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
+    printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
+    printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
 }
 
 /************************************************************************
@@ -1077,3 +1097,31 @@ void remove_book(int rank, card **player_hl, card **player_hr) {
 }
 
 
+/************************************************************************
+ * declare_winner(): Function that will analyze the players scores and  *
+ *      declare a winner if one exists or a tie of one occurrs.         *
+ ************************************************************************/
+void declare_winner(int p1_score, int p2_score) {
+    
+    printf("\n\nGAME OVER! LETS TALLY UP THE SCORES\n\n");
+    printf("Player 1: %d\n", p1_score);
+    printf("Player 2: %d\n", p2_score);
+    
+    if (p1_score > p2_score) {
+        // Player 1 wins
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><((('>  CONGRATULATIONS TO PLAYER 1, YOU ARE THE WINNER!!!!      ><((('>\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+    } else if (p1_score < p2_score) {
+        // Player 2 wins
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><((('>  CONGRATULATIONS TO PLAYER 2, YOU ARE THE WINNER!!!!      ><((('>\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+    } else {
+        // Tie Occurred
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><((('>  A TIE HAS OCCURRED! BETTER LUCK NEXT TIME!               ><((('>\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+    }
+    
+}
