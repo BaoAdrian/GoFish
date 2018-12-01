@@ -42,6 +42,9 @@ void swap(card *pt, int i, int j); // Function used to swap cards at index i and
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
 void print_hand(card *hl);
+void print_leftside_card(card *card);
+void print_rightside_card(card *card);
+
 
 card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
@@ -109,7 +112,9 @@ int main(void) {
 //        print_formatted_list(deck_hl);
         
         shuffle_deck(deck_hl);
-        
+        printf("*******************\n");
+        printf("* GENERATED DECK: *\n");
+        printf("*******************\n");
         print_hand(deck_hl);
         
 //        printf("\n\nSHUFFLED DECK: \n");
@@ -120,7 +125,9 @@ int main(void) {
         read_in_deck(&deck_hl, &deck_hr);
         
         printf("\nDECK FROM FILE: \n");
-        print_formatted_list(deck_hl);
+        //print_formatted_list(deck_hl);
+        
+        print_hand(deck_hl);
         
     }
     
@@ -637,10 +644,13 @@ void print_formatted_list(card *p) {
 void print_hand(card *hl) {
     
     card *temp = (card*)malloc(sizeof(card));
+    // serves as a flag to maintain pointer to the correct set of cards
+    card *current_start = (card*)malloc(sizeof(card));
     int length = find_length(hl);
     int running_length = length;
     
     temp = hl;
+    current_start = hl;
     
     int i;
     while (running_length > 0) {
@@ -654,16 +664,12 @@ void print_hand(card *hl) {
         
         i = 0;
         while (i < CARD_LIMIT && i < running_length) {
-            if (temp->value == 10) {
-                printf("|10\u2665  | ");
-            } else {
-                printf("|%c\u2665   | ", convert_rank(temp->value));
-            }
+            print_leftside_card(temp);
             temp = temp->next;
             i++;
         }
         printf("\n");
-        temp = hl;
+        temp = current_start;
         i = 0;
         while (i < CARD_LIMIT && i < running_length) {
             printf("|     | ");
@@ -673,11 +679,7 @@ void print_hand(card *hl) {
         
         i = 0;
         while (i < CARD_LIMIT && i < running_length) {
-            if (temp->value == 10) {
-                printf("|  10\u2665| ");
-            } else {
-                printf("|   %c\u2665| ", convert_rank(temp->value));
-            }
+            print_rightside_card(temp);
             temp = temp->next;
             i++;
         }
@@ -691,6 +693,7 @@ void print_hand(card *hl) {
         printf("\n");
         
         running_length = running_length - CARD_LIMIT;
+        current_start = temp;
         
     }
 
@@ -698,6 +701,53 @@ void print_hand(card *hl) {
     
 }
 
+
+void print_leftside_card(card *card) {
+    
+    // 10 is the special case since it takes up two spaces
+    if (card->value == 10) {
+        printf("|10");
+    } else {
+        printf("|%c ", convert_rank(card->value));
+    }
+    
+    if (strcmp(card->suit, "hearts") == 0) {
+        printf("\u2665  | ");
+    } else if (strcmp(card->suit, "diamonds") == 0) {
+        printf("\u2666  | ");
+    } else if (strcmp(card->suit, "spades") == 0) {
+        printf("\u2660  | ");
+    } else {
+        // Clubs
+        printf("\u2663  | ");
+    }
+    
+}
+
+
+void print_rightside_card(card *card) {
+    
+    // |  10\u2665|
+    
+    // 10 is the special case since it takes up two spaces
+    if (card->value == 10) {
+        printf("|  10");
+    } else {
+        printf("|   %c", convert_rank(card->value));
+    }
+    
+    if (strcmp(card->suit, "hearts") == 0) {
+        printf("\u2665| ");
+    } else if (strcmp(card->suit, "diamonds") == 0) {
+        printf("\u2666| ");
+    } else if (strcmp(card->suit, "spades") == 0) {
+        printf("\u2660| ");
+    } else {
+        // Clubs
+        printf("\u2663| ");
+    }
+    
+}
 
 
 
