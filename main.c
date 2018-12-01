@@ -169,15 +169,6 @@ int main(void) {
     
     
     
-    // Player 1 will play first, they will perform a query on the opposing players hand
-    // If the opposing player contains the rank they guess, they must surrender all cards
-    // of that rank.
-    
-    /*
-     * NOTE: Player1 -> turn = 1
-     *       Player2 -> turn = 2
-     */
-    
     // Play until a winner is detected
     while(check_for_winner(player1_hl, player2_hl, deck_hl) != 1) {
         
@@ -221,7 +212,6 @@ int main(void) {
                 printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
                 printf("Guess: ");
                 scanf("%s", guess);
-
                 guess_rank = convert_guess(guess);
                 
                 if (process_guess(players_turn, guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
@@ -249,10 +239,14 @@ int main(void) {
         }
         
         // Print hands after each turn
-        printf("\n\nPLAYER 1 HAND: \n");
+        printf("*********************************\n");
+        printf("* PLAYER 1 HAND:                *\n");
+        printf("*********************************\n");
         print_hand(player1_hl);
         
-        printf("PLAYER 2 HAND: \n");
+        printf("*********************************\n");
+        printf("* PLAYER 2 HAND:                *\n");
+        printf("*********************************\n");
         print_hand(player2_hl);
         
         
@@ -295,6 +289,20 @@ void print_title() {
     printf("\t\t|   9\u2660| |  10\u2660| |   J\u2660| |   Q\u2660| |   K\u2660| |   A\u2660|\n");
     printf("\t\t -----   -----   -----   -----   -----   -----\n\n");
 
+}
+
+/************************************************************************
+ * print_go_fish(): Function that prints large title to signify go fish *
+ ************************************************************************/
+void print_go_fish() {
+    printf("\n><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
+    printf("><((('>    ____     _____      _____ _____  _____                 ><((('>\n");
+    printf("><((('>  /         |     |    |        |   |       |    |   | |   ><((('>\n");
+    printf("><((('> |    ____  |     |    |___     |   |_____  |____|   | |   ><((('>\n");
+    printf("><((('> |      |\\  |     |    |        |        |  |    |   | |   ><((('>\n");
+    printf("><((('>  \\____/    |_____|    |      __|__ _____|  |    |   o o   ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
+    printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
 }
 
 
@@ -948,9 +956,10 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
         return 1;
     } else {
         // Card was not found, therefore, GOFISH occurs
-        printf("\n*************************************************************\n");
-        printf("* NOPE! GO FISH!!! CARD IS DRAWN FROM DECK AND ADDED TO HAND\n");
-        printf("*************************************************************\n");
+//        printf("\n*************************************************************\n");
+//        printf("* NOPE! GO FISH!!! CARD IS DRAWN FROM DECK AND ADDED TO HAND\n");
+//        printf("*************************************************************\n");
+        print_go_fish();
         go_fish(guesser_hl, guesser_hr, deck_hl, deck_hr);
         book_value = check_for_book(*guesser_hl);
         if (book_value != 0) {
