@@ -46,10 +46,10 @@ int check_for_book(card *hl);
 int convert_guess(char guess[]);
 void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
 void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr);
-int check_for_winner(card *p1_hl, card *p2_hl);
+int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
 
 void remove_book(int rank, card **player_hl, card **player_hr);
-int process_guess(int guess_rank, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
+int process_guess(int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
 
 
 /*
@@ -86,6 +86,11 @@ int main(void) {
     card *player1_hr = NULL;
     card *player2_hl = NULL;
     card *player2_hr = NULL;
+    int player1_score = 0;
+    int player2_score = 0;
+    int *p1_score_ptr = &player1_score;
+    int *p2_score_ptr = &player2_score;
+    
     
     // Get user selection: use shuffled deck(0) or use preformatted file input (1)
     deck_init = get_deck_selection();
@@ -147,6 +152,7 @@ int main(void) {
         printf("BOOK DETECTED\n");
         // Remove book that contains value book_value
         remove_book(book_value, &player1_hl, &player1_hr);
+        player1_score++;
     } else {
         printf("NO BOOK DETECTED\n");
         // Proceed
@@ -156,6 +162,7 @@ int main(void) {
         printf("BOOK DETECTED\n");
         // Remove book that contains value book_value
         remove_book(book_value, &player2_hl, &player2_hr);
+        player2_score++;
     } else {
         printf("NO BOOK DETECTED\n");
         // Proceed
@@ -173,7 +180,29 @@ int main(void) {
      */
     
     // Play until a winner is detected
-    while(check_for_winner(player1_hl, player2_hl) != 1) {
+    while(check_for_winner(player1_hl, player2_hl, deck_hl) != 1) {
+        
+        // Check the hands to ensure the game is still playable or break out if game is over
+        if (find_length(player1_hl) == 0) {
+            // Hand is empty, check to see if there are any more cards to draw from the deck
+            if (find_length(deck_hl) == 0) {
+                // Pool is empty, therefore game is over
+                break;
+            } else {
+                go_fish(&player1_hl, &player1_hr, &deck_hl, &deck_hr);
+            }
+        }
+        
+        // Check the hands to ensure the game is still playable or break out if game is over
+        if (find_length(player2_hl) == 0) {
+            // Hand is empty, check to see if there are any more cards to draw from the deck
+            if (find_length(deck_hl) == 0) {
+                // Pool is empty, therefore game is over
+                break;
+            } else {
+                go_fish(&player2_hl, &player2_hr, &deck_hl, &deck_hr);
+            }
+        }
 
         if (players_turn == 1) {
             // Player 1 goes
@@ -183,7 +212,7 @@ int main(void) {
 
             guess_rank = convert_guess(guess);
             
-            if (process_guess(guess_rank, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
+            if (process_guess(guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
                 // Card was found and moved, maintain turn
                 players_turn = 1;
             } else {
@@ -198,7 +227,7 @@ int main(void) {
             
             guess_rank = convert_guess(guess);
             
-            if (process_guess(guess_rank, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
+            if (process_guess(guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
                 // Card was found and moved, maintain turn
                 players_turn = 2;
             } else {
@@ -213,10 +242,14 @@ int main(void) {
         
         printf("PLAYER 2 HAND: \n");
         print_formatted_list(player2_hl);
+        
+        
 
     }
     
-    printf("WE HAVE A WINNER!");
+    printf("\n\nGAME OVER! LETS TALLY UP THE SCORES\n\n");
+    printf("Player 1: %d\n", *p1_score_ptr);
+    printf("Player 2: %d\n", *p2_score_ptr);
     
     
     
@@ -534,7 +567,7 @@ void swap(card *pt, int i, int j) {
 void print_list(card *p) {
     card *curr = p;
     while (curr != NULL) {
-        printf("[%d : %s] -> ", curr->value, curr->suit);
+        printf("[%d %s] -> ", curr->value, curr->suit);
         curr = curr->next;
     }
     printf("NULL\n");
@@ -553,13 +586,13 @@ void print_formatted_list(card *p) {
     card *curr = p;
     while (curr != NULL) {
         if (strcmp(curr->suit, "hearts") == 0) {
-            printf("[%d : \u2665] -> ", curr->value);
+            printf("[%d \u2665] -> ", curr->value);
         } else if (strcmp(curr->suit, "diamonds") == 0){
-            printf("[%d : \u2666] -> ", curr->value);
+            printf("[%d \u2666] -> ", curr->value);
         } else if (strcmp(curr->suit, "spades") == 0){
-            printf("[%d : \u2660] -> ", curr->value);
+            printf("[%d \u2660] -> ", curr->value);
         } else if (strcmp(curr->suit, "clubs") == 0){
-            printf("[%d : \u2663] -> ", curr->value);
+            printf("[%d \u2663] -> ", curr->value);
         }
         curr = curr->next;
     }
@@ -659,9 +692,9 @@ int convert_guess(char guess[]) {
  *      a hand is empty and a winner has been found.                    *
  *      Returns 1 if winner is detected, 0 otherwise.                   *
  ************************************************************************/
-int check_for_winner(card *p1_hl, card *p2_hl) {
-    if ((find_length(p1_hl) == 0) || (find_length(p2_hl) == 0)) {
-        // One of the hands is empty, therefore a player has won, return 1
+int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl) {
+    if (((find_length(p1_hl) == 0) || (find_length(p2_hl) == 0)) && (find_length(deck_hl) == 0)) {
+        // One of the hands is empty AND deck is empty, then game is no longer playable. Return 1
         return 1;
     } else {
         // No winner found, return 0
@@ -717,7 +750,7 @@ int check_for_book(card *hl) {
  *      rank. If so, keeps a count so that all cards of that rank can   *
  *      be transferred from opponent's hand to the guesser's hand.      *
  ************************************************************************/
-int process_guess(int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr, card **deck_hl, card **deck_hr) {
+int process_guess(int guess_rank, int **player_score, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr, card **deck_hl, card **deck_hr) {
    
     // Iterate through the list and see if rank exists in hand, if so, how many.
     int num_of_cards = 0;
@@ -742,6 +775,8 @@ int process_guess(int guess_rank, card **guesser_hl, card **guesser_hr, card **o
         book_value = check_for_book(*guesser_hl);
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
+            (**player_score)++;
+            printf("\nNEW SCORE: %d\n", **player_score);
         }
         return 1;
     } else {
@@ -751,6 +786,8 @@ int process_guess(int guess_rank, card **guesser_hl, card **guesser_hr, card **o
         book_value = check_for_book(*guesser_hl);
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
+            (**player_score)++;
+            printf("\nNEW SCORE: %d\n", **player_score);
         }
         return 0;
     }
