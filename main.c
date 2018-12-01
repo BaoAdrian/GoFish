@@ -19,6 +19,8 @@ const int NUM_OF_SWAPS = 200;
 const int GUESS_SIZE = 5;
 const int FORCE_SWAP = 3;
 const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
+const int PLAYER_ONE = 1;
+const int PLAYER_TWO = 2;
 
 /* Card declaration */
 typedef struct card_s {
@@ -56,7 +58,7 @@ void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_h
 int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
 
 void remove_book(int rank, card **player_hl, card **player_hr);
-int process_guess(int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
+int process_guess(int guesser, int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
 
 
 /*
@@ -107,81 +109,62 @@ int main(void) {
     if (deck_init == 0) {
         
         generate_random_deck(&deck_hl, &deck_hr);
-        
-//        printf("GENERATED DECK: \n");
-//        print_formatted_list(deck_hl);
-        
         shuffle_deck(deck_hl);
-        printf("*******************\n");
-        printf("* GENERATED DECK: *\n");
-        printf("*******************\n");
+        printf("*********************************\n");
+        printf("* GENERATED DECK:               *\n");
+        printf("*********************************\n");
         print_hand(deck_hl);
-        
-//        printf("\n\nSHUFFLED DECK: \n");
-//        print_formatted_list(deck_hl);
         
     } else if (deck_init == 1) {
         
         read_in_deck(&deck_hl, &deck_hr);
-        
-        printf("\nDECK FROM FILE: \n");
-        //print_formatted_list(deck_hl);
-        
+        printf("*********************************\n");
+        printf("* DECK FROM FILE:               *\n");
+        printf("*********************************\n");
         print_hand(deck_hl);
         
     }
     
-    printf("\n\nRest of this project is under construction. Come back soon!\n\n");
-    
-    /************************************************************************
-     * Generating player decks portion                                      *
-     ************************************************************************/
-    
-    printf("ORIGINAL POOL\n");
-    print_formatted_list(deck_hl);
-    
-    // create_player_hands(card *deck_hl, card *deck_hr, card *p1_hl, card *p1_hr, card *p2_hl, card *p2_hr, card **p1_hl, card** p1_hr, card **p2_hl, card **p2_hr)
+    // Generate player hands and display the table before gameplay starts
     create_player_hands(&deck_hl, &deck_hr, &player1_hl, &player1_hr, &player2_hl, &player2_hr);
     
-    printf("\n\nNEW DECK:\n");
-    print_formatted_list(deck_hl);
+    printf("*********************************\n");
+    printf("* NEW DECK:                     *\n");
+    printf("*********************************\n");
+    print_hand(deck_hl);
     
-    printf("\n\nPLAYER 1 HAND: \n");
-    print_formatted_list(player1_hl);
-    
-    printf("PLAYER 2 HAND: \n");
-    print_formatted_list(player2_hl);
-    
-    printf("\n");
+    printf("*********************************\n");
+    printf("* PLAYER 1 HAND:                *\n");
+    printf("*********************************\n");
     print_hand(player1_hl);
+    
+    printf("*********************************\n");
+    printf("* PLAYER 2 HAND:                *\n");
+    printf("*********************************\n");
     print_hand(player2_hl);
     
-    /************************************************************************
-     * Game Functionality Implementation                                    *
-     ************************************************************************/
-    printf("\n");
+    
+    printf("\n\n*********************************\n");
+    printf("* LET'S BEGIN!                  *\n");
+    printf("*********************************\n\n");
     
     // First, we must check to see if the cards that were dealt give a player a book
     // (highly unlikely) but necessary nonetheless.
     int book_value = check_for_book(player1_hl);
     if (book_value != 0) {
-        //printf("BOOK DETECTED\n");
-        // Remove book that contains value book_value
+        // Book Detected, remove and increment score
         remove_book(book_value, &player1_hl, &player1_hr);
         player1_score++;
     } else {
-        //printf("NO BOOK DETECTED\n");
-        // Proceed
+        // No Book detected, Proceed
     }
     book_value = check_for_book(player2_hl);
     if (book_value != 0) {
-        //printf("BOOK DETECTED\n");
-        // Remove book that contains value book_value
+        // Book Detected, remove and increment score
         remove_book(book_value, &player2_hl, &player2_hr);
         player2_score++;
     } else {
-        //printf("NO BOOK DETECTED\n");
-        // Proceed
+        //No Book detected, Proceed
     }
     
     
@@ -226,14 +209,14 @@ int main(void) {
 
         if (flag == FORCE_SWAP) {
             printf("SWITCHING TURNS!\n");
-            if (players_turn == 1) {
-                players_turn = 2;
+            if (players_turn == PLAYER_ONE) {
+                players_turn = PLAYER_TWO;
             } else {
-                players_turn = 1;
+                players_turn = PLAYER_ONE;
             }
             flag = 0; // Reset flag to playable state
         } else {
-            if (players_turn == 1) {
+            if (players_turn == PLAYER_ONE) {
                 // Player 1 goes
                 printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
                 printf("Guess: ");
@@ -241,14 +224,14 @@ int main(void) {
 
                 guess_rank = convert_guess(guess);
                 
-                if (process_guess(guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
+                if (process_guess(players_turn, guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
                     // Card was found and moved, maintain turn
-                    players_turn = 1;
+                    players_turn = PLAYER_ONE;
                 } else {
-                    players_turn = 2;
+                    players_turn = PLAYER_TWO;
                 }
                 
-            } else if (players_turn == 2) {
+            } else if (players_turn == PLAYER_TWO) {
                 // Player 2 goes
                 printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
                 printf("Guess: ");
@@ -256,27 +239,25 @@ int main(void) {
                 
                 guess_rank = convert_guess(guess);
                 
-                if (process_guess(guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
+                if (process_guess(players_turn, guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
                     // Card was found and moved, maintain turn
-                    players_turn = 2;
+                    players_turn = PLAYER_TWO;
                 } else {
-                    players_turn = 1;
+                    players_turn = PLAYER_ONE;
                 }
             }
         }
         
         // Print hands after each turn
         printf("\n\nPLAYER 1 HAND: \n");
-        //print_formatted_list(player1_hl);
         print_hand(player1_hl);
         
         printf("PLAYER 2 HAND: \n");
-        //print_formatted_list(player2_hl);
         print_hand(player2_hl);
         
         
 
-    }
+    } // end gameplaye whileloop
     
     printf("\n\nGAME OVER! LETS TALLY UP THE SCORES\n\n");
     printf("Player 1: %d\n", *p1_score_ptr);
@@ -698,33 +679,53 @@ void print_hand(card *hl) {
     }
 
     free(temp);
+    free(current_start);
     
 }
 
 
+/************************************************************************
+ * print_leftside_card(): Function that is specifically tailored to     *
+ *      correctly print the top left side of the card with rank & suit  *
+ ************************************************************************/
 void print_leftside_card(card *card) {
     
     // 10 is the special case since it takes up two spaces
     if (card->value == 10) {
         printf("|10");
+        if (strcmp(card->suit, "hearts") == 0) {
+            printf("\u2665  | ");
+        } else if (strcmp(card->suit, "diamonds") == 0) {
+            printf("\u2666  | ");
+        } else if (strcmp(card->suit, "spades") == 0) {
+            printf("\u2660  | ");
+        } else {
+            // Clubs
+            printf("\u2663  | ");
+        }
     } else {
-        printf("|%c ", convert_rank(card->value));
+        printf("|%c", convert_rank(card->value));
+        if (strcmp(card->suit, "hearts") == 0) {
+            printf("\u2665   | ");
+        } else if (strcmp(card->suit, "diamonds") == 0) {
+            printf("\u2666   | ");
+        } else if (strcmp(card->suit, "spades") == 0) {
+            printf("\u2660   | ");
+        } else {
+            // Clubs
+            printf("\u2663   | ");
+        }
     }
     
-    if (strcmp(card->suit, "hearts") == 0) {
-        printf("\u2665  | ");
-    } else if (strcmp(card->suit, "diamonds") == 0) {
-        printf("\u2666  | ");
-    } else if (strcmp(card->suit, "spades") == 0) {
-        printf("\u2660  | ");
-    } else {
-        // Clubs
-        printf("\u2663  | ");
-    }
+    
     
 }
 
 
+/************************************************************************
+ * print_rightside_card(): Function that is specifically tailored to    *
+ *      correctly print the bottom right of the card with rank & suit   *
+ ************************************************************************/
 void print_rightside_card(card *card) {
     
     // |  10\u2665|
@@ -748,15 +749,6 @@ void print_rightside_card(card *card) {
     }
     
 }
-
-
-
-/*********************************************/
-/* Rest of the Project to be completed below */
-/*********************************************/
-
-
-
 
 
 /************************************************************************
@@ -913,7 +905,7 @@ int check_for_book(card *hl) {
  *      rank. If so, keeps a count so that all cards of that rank can   *
  *      be transferred from opponent's hand to the guesser's hand.      *
  ************************************************************************/
-int process_guess(int guess_rank, int **player_score, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr, card **deck_hl, card **deck_hr) {
+int process_guess(int guesser, int guess_rank, int **player_score, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr, card **deck_hl, card **deck_hr) {
    
     // Iterate through the list and see if rank exists in hand, if so, how many.
     int num_of_cards = 0;
@@ -929,28 +921,44 @@ int process_guess(int guess_rank, int **player_score, card **guesser_hl, card **
         temp = temp->next;
     }
     
-    /* Verified up to this point */
-    
     // Now we check to see if any cards exist
     if (num_of_cards > 0) {
         // There is a card that needs to be transfered from opponenets deck to guessers deck
+        
+        if (guesser == PLAYER_ONE) {
+            // transfer from Player 2 to Player 1
+            printf("\n*************************************************************\n");
+            printf("* CARD FOUND! Transferring all %c's from Player 2 to Player 1\n", convert_rank(guess_rank));
+            printf("*************************************************************\n");
+        } else {
+            printf("\n*************************************************************\n");
+            printf("* CARD FOUND! Transferring all %c's from Player 1 to Player 2\n", convert_rank(guess_rank));
+            printf("*************************************************************\n");
+        }
+        
         transfer_cards(num_of_cards, guess_rank, guesser_hl, guesser_hr, opp_hl, opp_hr);
         book_value = check_for_book(*guesser_hl);
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
             (**player_score)++;
-            printf("\nNEW SCORE: %d\n", **player_score);
+            printf("***********************************\n");
+            printf("* NICE! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("***********************************\n");
         }
         return 1;
     } else {
         // Card was not found, therefore, GOFISH occurs
-        printf("NOPE! GO FISH!\n");
+        printf("\n*************************************************************\n");
+        printf("* NOPE! GO FISH!!! CARD IS DRAWN FROM DECK AND ADDED TO HAND\n");
+        printf("*************************************************************\n");
         go_fish(guesser_hl, guesser_hr, deck_hl, deck_hr);
         book_value = check_for_book(*guesser_hl);
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
             (**player_score)++;
-            printf("\nNEW SCORE: %d\n", **player_score);
+            printf("***********************************\n");
+            printf("* NICE! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("***********************************\n");
         }
         return 0;
     }
