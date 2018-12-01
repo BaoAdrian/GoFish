@@ -17,6 +17,7 @@ const int LINE_SIZE = 15;
 const int SUIT_LENGTH = 10;
 const int NUM_OF_SWAPS = 200;
 const int GUESS_SIZE = 5;
+const int FORCE_SWAP = 3;
 
 /* Card declaration */
 typedef struct card_s {
@@ -39,11 +40,13 @@ int rand_gen(int count);
 void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
 void print_list(card *card);
 void print_formatted_list(card *card); // Prints unicode characters instead of words
+void print_hand(card *hl);
 
 card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
 int check_for_book(card *hl);
 int convert_guess(char guess[]);
+char convert_rank(int rank);
 void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
 void go_fish(card **guesser_hl, card **guesser_hr, card **deck_hl, card **deck_hr);
 int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
@@ -73,6 +76,7 @@ int main(void) {
     /* Variable Declarations */
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     int players_turn = 1; // Binary 1 or 2 that alternates at each players turn
+    int forced_swap = FORCE_SWAP;
     char guess[GUESS_SIZE];
     int guess_rank;
     
@@ -138,7 +142,9 @@ int main(void) {
     printf("PLAYER 2 HAND: \n");
     print_formatted_list(player2_hl);
     
-    
+    printf("\n");
+    print_hand(player1_hl);
+    print_hand(player2_hl);
     
     /************************************************************************
      * Game Functionality Implementation                                    *
@@ -149,22 +155,22 @@ int main(void) {
     // (highly unlikely) but necessary nonetheless.
     int book_value = check_for_book(player1_hl);
     if (book_value != 0) {
-        printf("BOOK DETECTED\n");
+        //printf("BOOK DETECTED\n");
         // Remove book that contains value book_value
         remove_book(book_value, &player1_hl, &player1_hr);
         player1_score++;
     } else {
-        printf("NO BOOK DETECTED\n");
+        //printf("NO BOOK DETECTED\n");
         // Proceed
     }
     book_value = check_for_book(player2_hl);
     if (book_value != 0) {
-        printf("BOOK DETECTED\n");
+        //printf("BOOK DETECTED\n");
         // Remove book that contains value book_value
         remove_book(book_value, &player2_hl, &player2_hr);
         player2_score++;
     } else {
-        printf("NO BOOK DETECTED\n");
+        //printf("NO BOOK DETECTED\n");
         // Proceed
     }
     
@@ -190,6 +196,7 @@ int main(void) {
                 break;
             } else {
                 go_fish(&player1_hl, &player1_hr, &deck_hl, &deck_hr);
+                players_turn = FORCE_SWAP;
             }
         }
         
@@ -201,6 +208,7 @@ int main(void) {
                 break;
             } else {
                 go_fish(&player2_hl, &player2_hr, &deck_hl, &deck_hr);
+                players_turn = FORCE_SWAP;
             }
         }
 
@@ -234,14 +242,18 @@ int main(void) {
                 players_turn = 1;
             }
             
+        } else {
+            printf("Player ran out of cards! Drawing and switching turns\n");
         }
         
         // Print hands after each turn
         printf("\n\nPLAYER 1 HAND: \n");
-        print_formatted_list(player1_hl);
+        //print_formatted_list(player1_hl);
+        print_hand(player1_hl);
         
         printf("PLAYER 2 HAND: \n");
-        print_formatted_list(player2_hl);
+        //print_formatted_list(player2_hl);
+        print_hand(player2_hl);
         
         
 
@@ -600,6 +612,54 @@ void print_formatted_list(card *p) {
 }
 
 
+void print_hand(card *hl) {
+    
+    card *temp = (card*)malloc(sizeof(card));
+    int length = find_length(hl);
+    
+    temp = hl;
+    
+    for (int i = 0; i < length; i++) {
+        printf(" -----  ");
+    }
+    printf("\n");
+    
+    for (int i = 0; i < length; i++) {
+        if (temp->value == 10) {
+            printf("|10\u2665  | ");
+        } else {
+            printf("|%c\u2665   | ", convert_rank(temp->value));
+        }
+        temp = temp->next;
+    }
+    printf("\n");
+    temp = hl;
+    
+    for (int i = 0; i < length; i++) {
+        printf("|     | ");
+    }
+    printf("\n");
+    
+    for (int i = 0; i < length; i++) {
+        if (temp->value == 10) {
+            printf("|  10\u2665| ");
+        } else {
+            printf("|   %c\u2665| ", convert_rank(temp->value));
+        }
+        temp = temp->next;
+    }
+    printf("\n");
+    
+    for (int i = 0; i < length; i++) {
+        printf(" -----  ");
+    }
+    printf("\n");
+    
+    free(temp);
+    
+}
+
+
 
 
 /*********************************************/
@@ -683,7 +743,19 @@ int convert_guess(char guess[]) {
 }
 
 
-
+char convert_rank(int rank) {
+    
+    switch(rank) {
+            
+        case 1: return 'A';
+        case 11: return 'J';
+        case 12: return 'Q';
+        case 13: return 'K';
+        default: return (rank + '0');
+            
+    }
+    
+}
 
 
 /************************************************************************
