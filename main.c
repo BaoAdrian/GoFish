@@ -76,7 +76,7 @@ int main(void) {
     /* Variable Declarations */
     int deck_init; // Selection of which deck they'd like to start with, file or random shuffled deck
     int players_turn = 1; // Binary 1 or 2 that alternates at each players turn
-    int forced_swap = FORCE_SWAP;
+    int flag = 0;
     char guess[GUESS_SIZE];
     int guess_rank;
     
@@ -195,8 +195,9 @@ int main(void) {
                 // Pool is empty, therefore game is over
                 break;
             } else {
+                printf("PLAYER 1 RAN OUT OF CARDS! DRAW A CARD\n");
                 go_fish(&player1_hl, &player1_hr, &deck_hl, &deck_hr);
-                players_turn = FORCE_SWAP;
+                flag = FORCE_SWAP;
             }
         }
         
@@ -207,43 +208,51 @@ int main(void) {
                 // Pool is empty, therefore game is over
                 break;
             } else {
+                printf("PLAYER 2 RAN OUT OF CARDS! DRAW A CARD\n");
                 go_fish(&player2_hl, &player2_hr, &deck_hl, &deck_hr);
-                players_turn = FORCE_SWAP;
+                flag = FORCE_SWAP;
             }
         }
 
-        if (players_turn == 1) {
-            // Player 1 goes
-            printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
-            printf("Guess: ");
-            scanf("%s", guess);
-
-            guess_rank = convert_guess(guess);
-            
-            if (process_guess(guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
-                // Card was found and moved, maintain turn
-                players_turn = 1;
-            } else {
-                players_turn = 2;
-            }
-            
-        } else if (players_turn == 2) {
-            // Player 2 goes
-            printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
-            printf("Guess: ");
-            scanf("%s", guess);
-            
-            guess_rank = convert_guess(guess);
-            
-            if (process_guess(guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
-                // Card was found and moved, maintain turn
+        if (flag == FORCE_SWAP) {
+            printf("SWITCHING TURNS!\n");
+            if (players_turn == 1) {
                 players_turn = 2;
             } else {
                 players_turn = 1;
             }
-            
+            flag = 0; // Reset flag to playable state
         } else {
-            printf("Player ran out of cards! Drawing and switching turns\n");
+            if (players_turn == 1) {
+                // Player 1 goes
+                printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+                printf("Guess: ");
+                scanf("%s", guess);
+
+                guess_rank = convert_guess(guess);
+                
+                if (process_guess(guess_rank, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr)) {
+                    // Card was found and moved, maintain turn
+                    players_turn = 1;
+                } else {
+                    players_turn = 2;
+                }
+                
+            } else if (players_turn == 2) {
+                // Player 2 goes
+                printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+                printf("Guess: ");
+                scanf("%s", guess);
+                
+                guess_rank = convert_guess(guess);
+                
+                if (process_guess(guess_rank, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr)) {
+                    // Card was found and moved, maintain turn
+                    players_turn = 2;
+                } else {
+                    players_turn = 1;
+                }
+            }
         }
         
         // Print hands after each turn
@@ -609,9 +618,16 @@ void print_formatted_list(card *p) {
         curr = curr->next;
     }
     printf("NULL\n");
+    
+    free(curr);
 }
 
 
+/************************************************************************
+ * print_hand(): Function that uses a series of for loops to print out  *
+ *      that passed in players hand in a formatted graphics and unicode *
+ *      symbols to represent the suits.                                 *
+ ************************************************************************/
 void print_hand(card *hl) {
     
     card *temp = (card*)malloc(sizeof(card));
@@ -743,18 +759,20 @@ int convert_guess(char guess[]) {
 }
 
 
+/************************************************************************
+ * convert_rank(): Function that converts the integer rank to its char  *
+ *      equivalent (based on specifications) in order to print correctly*
+ *      when printing the card graphics.                                *
+ ************************************************************************/
 char convert_rank(int rank) {
-    
     switch(rank) {
-            
         case 1: return 'A';
         case 11: return 'J';
         case 12: return 'Q';
         case 13: return 'K';
-        default: return (rank + '0');
-            
+        default: return (rank + '0'); // Returns the character value of any integer
+                                      // I.e: 8 is returned as '8'...
     }
-    
 }
 
 
