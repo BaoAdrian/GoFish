@@ -18,6 +18,7 @@ const int SUIT_LENGTH = 10;
 const int NUM_OF_SWAPS = 200;
 const int GUESS_SIZE = 5;
 const int FORCE_SWAP = 3;
+const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
 
 /* Card declaration */
 typedef struct card_s {
@@ -104,13 +105,15 @@ int main(void) {
         
         generate_random_deck(&deck_hl, &deck_hr);
         
-        printf("GENERATED DECK: \n");
-        print_formatted_list(deck_hl);
+//        printf("GENERATED DECK: \n");
+//        print_formatted_list(deck_hl);
         
         shuffle_deck(deck_hl);
         
-        printf("\n\nSHUFFLED DECK: \n");
-        print_formatted_list(deck_hl);
+        print_hand(deck_hl);
+        
+//        printf("\n\nSHUFFLED DECK: \n");
+//        print_formatted_list(deck_hl);
         
     } else if (deck_init == 1) {
         
@@ -285,24 +288,24 @@ int main(void) {
  ************************************************************************/
 void print_title() {
     
-    printf(" -----   -----   -----   -----   -----   -----\n");
-    printf("|A\u2665   | |K\u2665   | |Q\u2665   | |J\u2665   | |10\u2665  | |9\u2665   |\n");
-    printf("|     | |     | |     | |     | |     | |     |\n");
-    printf("|   A\u2665| |   K\u2665| |   Q\u2665| |   J\u2665| |  10\u2665| |   9\u2665|\n");
-    printf(" -----   -----   -----   -----   -----   -----\n");
+    printf("\t\t -----   -----   -----   -----   -----   -----\n");
+    printf("\t\t|A\u2665   | |K\u2665   | |Q\u2665   | |J\u2665   | |10\u2665  | |9\u2665   |\n");
+    printf("\t\t|     | |     | |     | |     | |     | |     |\n");
+    printf("\t\t|   A\u2665| |   K\u2665| |   Q\u2665| |   J\u2665| |  10\u2665| |   9\u2665|\n");
+    printf("\t\t -----   -----   -----   -----   -----   -----\n");
     
     //  Prints START
-    printf(" -----    __  _____  ___   ___   _____   -----\n");
-    printf("|A\u2663   |  |      |   |   | |   |    |    |A\u2663   |\n");
-    printf("|     |   --    |   |---| | --     |    |     |\n");
-    printf("|   A\u2663|     |   |   |   | |  \\     |    |   A\u2663|\n");
-    printf(" -----    --    |   |   | |   \\    |     -----\n");
+    printf("\t\t -----    __  _____  ___   ___   _____   -----\n");
+    printf("\t\t|A\u2663   |  |      |   |   | |   |    |    |A\u2663   |\n");
+    printf("\t\t|     |   --    |   |---| | --     |    |     |\n");
+    printf("\t\t|   A\u2663|     |   |   |   | |  \\     |    |   A\u2663|\n");
+    printf("\t\t -----    --    |   |   | |   \\    |     -----\n");
     
-    printf(" -----   -----   -----   -----   -----   -----\n");
-    printf("|9\u2660   | |10\u2660  | |J\u2660   | |Q\u2660   | |K\u2660   | |A\u2660   |\n");
-    printf("|     | |     | |     | |     | |     | |     |\n");
-    printf("|   9\u2660| |  10\u2660| |   J\u2660| |   Q\u2660| |   K\u2660| |   A\u2660|\n");
-    printf(" -----   -----   -----   -----   -----   -----\n\n");
+    printf("\t\t -----   -----   -----   -----   -----   -----\n");
+    printf("\t\t|9\u2660   | |10\u2660  | |J\u2660   | |Q\u2660   | |K\u2660   | |A\u2660   |\n");
+    printf("\t\t|     | |     | |     | |     | |     | |     |\n");
+    printf("\t\t|   9\u2660| |  10\u2660| |   J\u2660| |   Q\u2660| |   K\u2660| |   A\u2660|\n");
+    printf("\t\t -----   -----   -----   -----   -----   -----\n\n");
 
 }
 
@@ -514,6 +517,8 @@ int find_length(card *hl) {
         curr = curr->next;
     }
     
+    free(curr);
+    
     return length;
 }
 
@@ -574,6 +579,7 @@ void swap(card *pt, int i, int j) {
     node_2->value = temp_value;
     strcpy(node_2->suit, temp_suit);
     
+    
 }
 
 
@@ -624,53 +630,70 @@ void print_formatted_list(card *p) {
 
 
 /************************************************************************
- * print_hand(): Function that uses a series of for loops to print out  *
- *      that passed in players hand in a formatted graphics and unicode *
+ * print_hand(): Function that uses a series of while loops to print    *
+ *      the passed-in players hand with formatted graphics and unicode  *
  *      symbols to represent the suits.                                 *
  ************************************************************************/
 void print_hand(card *hl) {
     
     card *temp = (card*)malloc(sizeof(card));
     int length = find_length(hl);
+    int running_length = length;
     
     temp = hl;
     
-    for (int i = 0; i < length; i++) {
-        printf(" -----  ");
-    }
-    printf("\n");
-    
-    for (int i = 0; i < length; i++) {
-        if (temp->value == 10) {
-            printf("|10\u2665  | ");
-        } else {
-            printf("|%c\u2665   | ", convert_rank(temp->value));
+    int i;
+    while (running_length > 0) {
+        i = 0;
+        
+        while (i < CARD_LIMIT && i < running_length) {
+            printf(" -----  ");
+            i++;
         }
-        temp = temp->next;
-    }
-    printf("\n");
-    temp = hl;
-    
-    for (int i = 0; i < length; i++) {
-        printf("|     | ");
-    }
-    printf("\n");
-    
-    for (int i = 0; i < length; i++) {
-        if (temp->value == 10) {
-            printf("|  10\u2665| ");
-        } else {
-            printf("|   %c\u2665| ", convert_rank(temp->value));
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            if (temp->value == 10) {
+                printf("|10\u2665  | ");
+            } else {
+                printf("|%c\u2665   | ", convert_rank(temp->value));
+            }
+            temp = temp->next;
+            i++;
         }
-        temp = temp->next;
+        printf("\n");
+        temp = hl;
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            printf("|     | ");
+            i++;
+        }
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            if (temp->value == 10) {
+                printf("|  10\u2665| ");
+            } else {
+                printf("|   %c\u2665| ", convert_rank(temp->value));
+            }
+            temp = temp->next;
+            i++;
+        }
+        printf("\n");
+        
+        i = 0;
+        while (i < CARD_LIMIT && i < running_length) {
+            printf(" -----  ");
+            i++;
+        }
+        printf("\n");
+        
+        running_length = running_length - CARD_LIMIT;
+        
     }
-    printf("\n");
-    
-    for (int i = 0; i < length; i++) {
-        printf(" -----  ");
-    }
-    printf("\n");
-    
+
     free(temp);
     
 }
