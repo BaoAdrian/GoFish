@@ -13,14 +13,23 @@
 #include <math.h> // Random number generator for shuffling
 #include <time.h> // Used to seed the random number generator
 
-const int LINE_SIZE = 15;
-const int SUIT_LENGTH = 10;
-const int NUM_OF_SWAPS = 200;
-const int GUESS_SIZE = 5;
-const int FORCE_SWAP = 3;
-const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
-const int PLAYER_ONE = 1;
-const int PLAYER_TWO = 2;
+#define LINE_SIZE 15
+#define SUIT_LENGTH 10
+#define NUM_OF_SWAPS 200
+#define GUESS_SIZE 5
+#define FORCE_SWAP 3
+#define CARD_LIMIT 7
+#define PLAYER_ONE 1
+#define PLAYER_TWO 2
+
+//const int LINE_SIZE = 15;
+//const int SUIT_LENGTH = 10;
+//const int NUM_OF_SWAPS = 200;
+//const int GUESS_SIZE = 5;
+//const int FORCE_SWAP = 3;
+//const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
+//const int PLAYER_ONE = 1;
+//const int PLAYER_TWO = 2;
 
 /* Card declaration */
 typedef struct card_s {
