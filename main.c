@@ -13,6 +13,7 @@
 #include <math.h> // Random number generator for shuffling
 #include <time.h> // Used to seed the random number generator
 
+#define FILENAME_SIZE 30
 #define LINE_SIZE 15
 #define SUIT_LENGTH 10
 #define NUM_OF_SWAPS 200
@@ -22,6 +23,7 @@
 #define PLAYER_ONE 1
 #define PLAYER_TWO 2
 
+//const int FILENAME_SIZE = 30;
 //const int LINE_SIZE = 15;
 //const int SUIT_LENGTH = 10;
 //const int NUM_OF_SWAPS = 200;
@@ -62,7 +64,8 @@ int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card *
 int validate_guess(char *guess);
 int convert_guess(char guess[]);
 char convert_rank(int rank);
-int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl);
+int check_if_playable(card *p1_hl, card *p2_hl, card *deck_hl);
+int check_for_winner(int* p1_score, int *p2_score);
 int check_for_book(card *hl);
 int process_guess(int guesser, int guess_rank, int **player_score,  card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr, card **deck_hl, card **deck_hr);
 void transfer_cards(int num_of_cards, int guess_rank, card **guesser_hl, card **guesser_hr, card **opp_hl, card **opp_hr);
@@ -137,11 +140,6 @@ int main(void) {
     create_player_hands(&deck_hl, &deck_hr, &player1_hl, &player1_hr, &player2_hl, &player2_hr);
     
     printf("*********************************\n");
-    printf("* NEW DECK:                     *\n");
-    printf("*********************************\n");
-    print_hand(deck_hl);
-    
-    printf("*********************************\n");
     printf("* PLAYER 1 HAND:                *\n");
     printf("*********************************\n");
     print_hand(player1_hl);
@@ -178,7 +176,7 @@ int main(void) {
     
     
     // Now loop until a winner is declared
-    while(check_for_winner(player1_hl, player2_hl, deck_hl) != 1) {
+    while(check_if_playable(player1_hl, player2_hl, deck_hl) != 1) {
         
         // Check the hands to ensure the game is still playable or break out if game is over
         if (find_length(player1_hl) == 0) {
@@ -235,13 +233,18 @@ int main(void) {
         printf("*********************************\n");
         print_hand(player2_hl);
         
+        if (check_for_winner(p1_score_ptr, p2_score_ptr) != 0) {
+            // A winner has been found, declare the winner
+            declare_winner(*p1_score_ptr, *p2_score_ptr);
+            break;
+        }
         
 
     } // end gameplaye whileloop
     
     
+    printf("\n\nTHANKS FOR PLAYING!\n\n");
     
-    declare_winner(*p1_score_ptr, *p2_score_ptr);
     
     return 0;
 }
@@ -304,6 +307,8 @@ void print_go_fish() {
     printf("><((('> |    ____  |     |    |___     |   |_____  |____|   | |   ><((('>\n");
     printf("><((('> |      |\\  |     |    |        |        |  |    |   | |   ><((('>\n");
     printf("><((('>  \\____/    |_____|    |      __|__ _____|  |    |   o o   ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
+    printf("><((('>     Incorrect Guess! Draw a card! Switching Turns!        ><((('>\n");
     printf("><((('>                                                           ><((('>\n");
     printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
 }
@@ -552,10 +557,16 @@ void read_in_deck(card **deck_hl, card **deck_hr) {
     
     
     char line[LINE_SIZE];
-    
+    char filename[FILENAME_SIZE];
     // Load deck from preformatted file
     FILE *inp;
-    inp = fopen("ordered_deck.txt", "r");
+    
+    // Request the filename from the user
+    printf("Enter the filename you wish to read from: ");
+    scanf("%s", filename);
+    
+    // Attempt to open and read given file
+    inp = fopen(filename, "r");
     if (inp == NULL) {
         printf("ERROR: Could not open file. Ending Program\n");
         exit(-1);
@@ -823,14 +834,13 @@ int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card *
     char guess[GUESS_SIZE];
     int guess_rank;
     
-    // Player 1 goes
-    printf("Player 1, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+    printf("Player %d, Make a Guess (please enter A, 2-10, J, Q, or K): \n", players_turn);
     printf("Guess: ");
     scanf("%s", guess);
     
     while (validate_guess(guess) != 1) {
         printf("That is not a valid guess. Try Again\n");
-        printf("Player 2, Make a Guess (please enter A, 2-10, J, Q, or K): \n");
+        printf("Player %d, Make a Guess (please enter A, 2-10, J, Q, or K): \n", players_turn);
         printf("Guess: ");
         scanf("%s", guess);
     }
@@ -923,7 +933,7 @@ char convert_rank(int rank) {
  *      a hand is empty and a winner has been found.                    *
  *      Returns 1 if winner is detected, 0 otherwise.                   *
  ************************************************************************/
-int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl) {
+int check_if_playable(card *p1_hl, card *p2_hl, card *deck_hl) {
     if (((find_length(p1_hl) == 0) || (find_length(p2_hl) == 0)) && (find_length(deck_hl) == 0)) {
         // One of the hands is empty AND deck is empty, then game is no longer playable. Return 1
         return 1;
@@ -931,6 +941,17 @@ int check_for_winner(card *p1_hl, card *p2_hl, card *deck_hl) {
         // No winner found, return 0
         return 0;
     }
+}
+
+int check_for_winner(int *p1_score, int *p2_score) {
+    
+    if (*p1_score >= 7) {
+        return PLAYER_ONE;
+    } else if (*p2_score >= 7) {
+        return PLAYER_TWO;
+    }
+    return 0;
+    
 }
 
 
@@ -1003,13 +1024,33 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
         
         if (guesser == PLAYER_ONE) {
             // transfer from Player 2 to Player 1
-            printf("\n*************************************************************\n");
-            printf("* CARD FOUND! Transferring all %c's from Player 2 to Player 1\n", convert_rank(guess_rank));
-            printf("*************************************************************\n");
+            if (guess_rank == 10) {
+                printf("\n*************************************************************\n");
+                printf("*\n");
+                printf("* CARD FOUND! Transferring all 10's from Player 2 to Player 1\n");
+                printf("*\n");
+                printf("*************************************************************\n");
+            } else {
+                printf("\n*************************************************************\n");
+                printf("*\n");
+                printf("* CARD FOUND! Transferring all %c's from Player 2 to Player 1\n", convert_rank(guess_rank));
+                printf("*\n");
+                printf("*************************************************************\n");
+            }
         } else {
-            printf("\n*************************************************************\n");
-            printf("* CARD FOUND! Transferring all %c's from Player 1 to Player 2\n", convert_rank(guess_rank));
-            printf("*************************************************************\n");
+            if (guess_rank == 10) {
+                printf("\n*************************************************************\n");
+                printf("*\n");
+                printf("* CARD FOUND! Transferring all 10's from Player 1 to Player 2\n");
+                printf("*\n");
+                printf("*************************************************************\n");
+            } else {
+                printf("\n*************************************************************\n");
+                printf("*\n");
+                printf("* CARD FOUND! Transferring all %c's from Player 1 to Player 2\n", convert_rank(guess_rank));
+                printf("*\n");
+                printf("*************************************************************\n");
+            }
         }
         
         transfer_cards(num_of_cards, guess_rank, guesser_hl, guesser_hr, opp_hl, opp_hr);
@@ -1017,9 +1058,11 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
             (**player_score)++;
-            printf("***********************************\n");
-            printf("* NICE! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
-            printf("***********************************\n");
+            printf("\n*************************************************************\n");
+            printf("*\n");
+            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("*\n");
+            printf("\n*************************************************************\n");
         }
         return 1;
     } else {
@@ -1030,9 +1073,11 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
         if (book_value != 0) {
             remove_book(book_value, guesser_hl, guesser_hr);
             (**player_score)++;
-            printf("***********************************\n");
-            printf("* NICE! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
-            printf("***********************************\n");
+            printf("\n*************************************************************\n");
+            printf("*\n");
+            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("*\n");
+            printf("\n*************************************************************\n");
         }
         return 0;
     }
@@ -1118,17 +1163,17 @@ void declare_winner(int p1_score, int p2_score) {
     
     if (p1_score > p2_score) {
         // Player 1 wins
-        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
         printf("><((('>  CONGRATULATIONS TO PLAYER 1, YOU ARE THE WINNER!!!!      ><((('>\n");
         printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
     } else if (p1_score < p2_score) {
         // Player 2 wins
-        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
         printf("><((('>  CONGRATULATIONS TO PLAYER 2, YOU ARE THE WINNER!!!!      ><((('>\n");
         printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
     } else {
         // Tie Occurred
-        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+        printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
         printf("><((('>  A TIE HAS OCCURRED! BETTER LUCK NEXT TIME!               ><((('>\n");
         printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
     }
