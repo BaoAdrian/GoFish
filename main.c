@@ -63,6 +63,7 @@ card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
 int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card **player1_hr, card **player2_hl, card **player2_hr, card **deck_hl, card **deck_hr);
 int validate_guess(char *guess);
+int validate_possession(int guess_rank, card *guesser_hl);
 int convert_guess(char guess[]);
 char convert_rank(int rank);
 int check_if_playable(card *p1_hl, card *p2_hl, card *deck_hl);
@@ -882,6 +883,24 @@ int validate_guess(char *guess) {
     
 }
 
+int validate_possession(int guess_rank, card *guesser_hl) {
+    
+    card *temp = (card*)malloc(sizeof(card));
+    
+    // Check to see if the user guessed a rank that they posses
+    temp = guesser_hl;
+    while (temp != NULL) {
+        if (temp->value == guess_rank) {
+            // Player possess card, proceed to process guess
+            return 1;
+        }
+        temp = temp->next;
+    }
+    
+    return 0;
+    
+}
+
 
 /************************************************************************
  * convert_guess(): Function that will accept a user query in the form  *
@@ -1013,6 +1032,15 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
     int book_value;
     
     card *temp = (card*)malloc(sizeof(card));
+    char guess[GUESS_SIZE];
+    
+    while (validate_possession(guess_rank, *guesser_hl) != 1) {
+        printf("Oops! You do not possess that card! Try again!\n");
+        printf("Player %d, Make a Guess (please enter A, 2-10, J, Q, or K): \n", guesser);
+        printf("Guess: ");
+        scanf("%s", guess);
+        guess_rank = convert_guess(guess);
+    }
     
     temp = *opp_hl;
     while (temp != NULL) {
