@@ -14,26 +14,26 @@
 #include <time.h> // Used to seed the random number generator
 
 // Support for prior C99 Machines
-#define FILENAME_SIZE 30
-#define LINE_SIZE 15
-#define SUIT_LENGTH 10
-#define NUM_OF_SWAPS 200
-#define GUESS_SIZE 5
-#define FORCE_SWAP 3
-#define CARD_LIMIT 7
-#define PLAYER_ONE 1
-#define PLAYER_TWO 2
+//#define FILENAME_SIZE 30
+//#define LINE_SIZE 15
+//#define SUIT_LENGTH 10
+//#define NUM_OF_SWAPS 200
+//#define GUESS_SIZE 5
+//#define FORCE_SWAP 3
+//#define CARD_LIMIT 7
+//#define PLAYER_ONE 1
+//#define PLAYER_TWO 2
 
-//const int FILENAME_SIZE = 30;
-//const int LINE_SIZE = 15;
-//const int SUIT_LENGTH = 10;
-//const int NUM_OF_SWAPS = 200;
-//const int GUESS_SIZE = 5;
-//const int FORCE_SWAP = 3;
-//const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
-//const int PLAYER_ONE = 1;
-//const int PLAYER_TWO = 2;
-
+const int FILENAME_SIZE = 30;
+const int LINE_SIZE = 15;
+const int SUIT_LENGTH = 10;
+const int NUM_OF_SWAPS = 200;
+const int GUESS_SIZE = 5;
+const int FORCE_SWAP = 3;
+const int CARD_LIMIT = 7; // Limits the number of cards that can be displayed in one row
+const int PLAYER_ONE = 1;
+const int PLAYER_TWO = 2;
+ 
 /* Card declaration */
 typedef struct card_s {
     char suit[SUIT_LENGTH];
@@ -45,7 +45,7 @@ typedef struct card_s {
 /* Function Prototypes */
 void print_go_fish_title(void);
 void print_list(card *card);
-void print_formatted_list(card *card); // Prints unicode characters instead of words
+void print_formatted_list(card *card); 
 void print_go_fish(void);
 void print_hand(card *hl);
 void print_leftside_card(card *card);
@@ -53,12 +53,12 @@ void print_rightside_card(card *card);
 int get_deck_selection(void);
 void generate_random_deck(card **deck_hl, card **deck_hr);
 void read_in_deck(card **deck_hl, card **hr);
-void add_to_end(card *p, card **hl, card **hr, card *temp_card); // Add card to end of list
-card* pull_card_data(char line[]); // Parse line from file into Card Struct
+void add_to_end(card *p, card **hl, card **hr, card *temp_card);
+card* pull_card_data(char line[]);
 void shuffle_deck(card *hl);
 int find_length(card *hl);
 int rand_gen(int count);
-void swap(card *pt, int i, int j); // Function used to swap cards at index i and j
+void swap(card *pt, int i, int j);
 card* remove_member(card *p, card **hl, card **hr);
 void create_player_hands(card **deck_hl, card **deck_hr, card **p1_hl, card **p1_hr, card **p2_hl, card **p2_hr);
 int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card **player1_hr, card **player2_hl, card **player2_hr, card **deck_hl, card **deck_hr);
@@ -1064,9 +1064,9 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
             (**player_score)++;
             printf("\n*************************************************************\n");
             printf("*\n");
-            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's NEW SCORE IS: %d  \n", guesser, **player_score);
             printf("*\n");
-            printf("\n*************************************************************\n");
+            printf("*************************************************************\n");
         }
         return 1;
     } else {
@@ -1079,9 +1079,9 @@ int process_guess(int guesser, int guess_rank, int **player_score, card **guesse
             (**player_score)++;
             printf("\n*************************************************************\n");
             printf("*\n");
-            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's SCORE IS: %d  \n", guesser, **player_score);
+            printf("* NICE JOB COMPLETING A BOOK! PLAYER %d's NEW SCORE IS: %d  \n", guesser, **player_score);
             printf("*\n");
-            printf("\n*************************************************************\n");
+            printf("*************************************************************\n");
         }
         return 0;
     }
