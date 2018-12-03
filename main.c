@@ -13,6 +13,7 @@
 #include <math.h> // Random number generator for shuffling
 #include <time.h> // Used to seed the random number generator
 
+// Support for prior C99 Machines
 #define FILENAME_SIZE 30
 #define LINE_SIZE 15
 #define SUIT_LENGTH 10
@@ -235,14 +236,13 @@ int main(void) {
         
         if (check_for_winner(p1_score_ptr, p2_score_ptr) != 0) {
             // A winner has been found, declare the winner
-            declare_winner(*p1_score_ptr, *p2_score_ptr);
             break;
         }
         
 
     } // end gameplaye whileloop
     
-    
+    declare_winner(*p1_score_ptr, *p2_score_ptr);
     printf("\n\nTHANKS FOR PLAYING!\n\n");
     
     
@@ -275,27 +275,32 @@ void print_go_fish_title() {
     printf("><((('>     a players hand at any point in the game, that book    ><((('>\n");
     printf("><((('>     will be removed from the players hand and their score ><((('>\n");
     printf("><((('>     will be incremented.                                  ><((('>\n");
-    printf("><((('>  5. When a player guesses a rank against opponenets hand  ><((('>\n");
+    printf("><((('>  5. When a player guesses a rank against opponents hand   ><((('>\n");
     printf("><((('>     and the opponent holds ANY number of cards containing ><((('>\n");
     printf("><((('>     that rank, they must surrender the cards to guessing  ><((('>\n");
     printf("><((('>     player. Guessing player maintains the turn.           ><((('>\n");
     printf("><((('>  6. When a player guesses a rank against opponents hand   ><((('>\n");
     printf("><((('>     and the opponent does NOT hold any cards of that rank ><((('>\n");
     printf("><((('>     GO FISH occurs and the guessing player draws a card   ><((('>\n");
-    printf("><((('>     from the pool. Turn is then switched to opponent      ><((('>\n");
+    printf("><((('>     from the pool. Turn is then switched to opponent.     ><((('>\n");
     printf("><((('>  7. If at any point in the game, one of the players hand  ><((('>\n");
     printf("><((('>     is empty, i.e. if the guessing player has taken all   ><((('>\n");
     printf("><((('>     of their cards, then the player must draw one card    ><((('>\n");
     printf("><((('>     from the pool and the turns are switched.             ><((('>\n");
     printf("><((('>  8. A winner is declared when either all books have been  ><((('>\n");
-    printf("><((('>     collected or one of the players runs out of cards and ><((('>\n");
-    printf("><((('>     no more cards remain in the pool. The score is then   ><((('>\n");
-    printf("><((('>     tallied and the winner is the player who completed    ><((('>\n");
-    printf("><((('>     the most books.                                       ><((('>\n");
+    printf("><((('>     collected or one of the players collects a total of   ><((('>\n");
+    printf("><((('>     7 complete books. At that point the scores wil be     ><((('>\n");
+    printf("><((('>     displayed and a final message will declare a winner.  ><((('>\n");
+    printf("><((('>  9. In the rare event that the pool is empty and one of   ><((('>\n");
+    printf("><((('>     players also has an empty hand, the game is then      ><((('>\n");
+    printf("><((('>     deemed unplayable and a winner is declared based on   ><((('>\n");
+    printf("><((('>     the score that it is currently at.                    ><((('>\n");
+    printf("><((('>                                                           ><((('>\n");
     printf("><((('>                                                           ><((('>\n");
     printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
     printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
 }
+
 
 /************************************************************************
  * print_go_fish(): Function that prints large title to signify go fish *
@@ -864,12 +869,6 @@ int guess_a_card(int players_turn, int **p1_score_ptr, card **player1_hl, card *
     }
     
 }
-
-
-
-
-
-
 
 
 /************************************************************************
