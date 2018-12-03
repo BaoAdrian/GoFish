@@ -216,23 +216,20 @@ int main(void) {
         } else {
             if (players_turn == PLAYER_ONE) {
                 // Execute entire processing of a guess within this function call
+                printf("\n*********************************\n");
+                printf("* PLAYER 1 HAND:                *\n");
+                printf("*********************************\n");
+                print_hand(player1_hl);
                 players_turn = guess_a_card(players_turn, &p1_score_ptr, &player1_hl, &player1_hr, &player2_hl, &player2_hr, &deck_hl, &deck_hr);
             } else if (players_turn == PLAYER_TWO) {
                 // Execute entire processing of a guess within this function call
+                printf("\n*********************************\n");
+                printf("* PLAYER 2 HAND:                *\n");
+                printf("*********************************\n");
+                print_hand(player2_hl);
                 players_turn = guess_a_card(players_turn, &p2_score_ptr, &player2_hl, &player2_hr, &player1_hl, &player1_hr, &deck_hl, &deck_hr);
             }
         }
-        
-        // Print hands after each turn
-        printf("\n*********************************\n");
-        printf("* PLAYER 1 HAND:                *\n");
-        printf("*********************************\n");
-        print_hand(player1_hl);
-        
-        printf("\n*********************************\n");
-        printf("* PLAYER 2 HAND:                *\n");
-        printf("*********************************\n");
-        print_hand(player2_hl);
         
         if (check_for_winner(p1_score_ptr, p2_score_ptr) != 0) {
             // A winner has been found, declare the winner
