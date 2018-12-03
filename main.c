@@ -928,10 +928,11 @@ char convert_rank(int rank) {
 
 
 /************************************************************************
- * check_for_winner(): Function that checks to see if either of the     *
- *      players hands has a length of zero, if so, that indicates that  *
- *      a hand is empty and a winner has been found.                    *
- *      Returns 1 if winner is detected, 0 otherwise.                   *
+ * check_if_playable(): Function that checks to see if the game is still*
+ *      playable. I.e. the highly unlikely case where the winning score *
+ *      has not been reached, the pool no longer has cards, and one of  *
+ *      the players has an empty hand (whom cannot draw any cards from  *
+ *      an empty pool. Will return 1 if dead game, 0 otherwise.         *
  ************************************************************************/
 int check_if_playable(card *p1_hl, card *p2_hl, card *deck_hl) {
     if (((find_length(p1_hl) == 0) || (find_length(p2_hl) == 0)) && (find_length(deck_hl) == 0)) {
@@ -943,6 +944,13 @@ int check_if_playable(card *p1_hl, card *p2_hl, card *deck_hl) {
     }
 }
 
+
+/************************************************************************
+ * check_for_winner(): Function that will be called at each iteration   *
+ *      of a turn to see if either of the players has acheived the      *
+ *      winning score of 7. When that occurs, game will declare a       *
+ *      winner and display an ending message.                           *
+ ************************************************************************/
 int check_for_winner(int *p1_score, int *p2_score) {
     
     if (*p1_score >= 7) {
