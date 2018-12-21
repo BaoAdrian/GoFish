@@ -1,5 +1,4 @@
 # GoFish
-Final Project
 
 <h1> Directory </h1>
 
