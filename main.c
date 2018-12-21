@@ -242,6 +242,14 @@ int main(void) {
     
     declare_winner(*p1_score_ptr, *p2_score_ptr);
     printf("\n\nTHANKS FOR PLAYING!\n\n");
+ 
+    // free memory
+    free(deck_hl);
+    free(deck_hr);
+    free(player1_hl);
+    free(player1_hr);
+    free(player2_hl);
+    free(player2_hr);
     
     
     return 0;
