@@ -1,6 +1,5 @@
 //
 //  main.c
-//  ECE175_FinalProject
 //
 //  Created by Adrian Bao and Liam Gill on 11/21/2018
 //
@@ -141,20 +140,21 @@ int main(void) {
     // Generate player hands and display the table before gameplay starts
     create_player_hands(&deck_hl, &deck_hr, &player1_hl, &player1_hr, &player2_hl, &player2_hr);
     
-    printf("*********************************\n");
-    printf("* PLAYER 1 HAND:                *\n");
-    printf("*********************************\n");
-    print_hand(player1_hl);
+    // printf("*********************************\n");
+    // printf("* PLAYER 1 HAND:                *\n");
+    // printf("*********************************\n");
+    // print_hand(player1_hl);
     
-    printf("*********************************\n");
-    printf("* PLAYER 2 HAND:                *\n");
-    printf("*********************************\n");
-    print_hand(player2_hl);
+    // printf("*********************************\n");
+    // printf("* PLAYER 2 HAND:                *\n");
+    // printf("*********************************\n");
+    // print_hand(player2_hl);
+
     
     
     // Start the Gameplay
     printf("\n\n*********************************\n");
-    printf("* LET'S BEGIN!                  *\n");
+    printf("* HANDS DEALT! LET'S BEGIN!     *\n");
     printf("*********************************\n\n");
     
     // First check highly unlikely case where a player is dealt a book at start of game.
@@ -312,6 +312,7 @@ void print_go_fish_title() {
  * print_go_fish(): Function that prints large title to signify go fish *
  ************************************************************************/
 void print_go_fish() {
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); // Clear Screen
     printf("\n><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n");
     printf("><((('>    ____     _____      _____ _____  _____                 ><((('>\n");
     printf("><((('>  /         |     |    |        |   |       |    |   | |   ><((('>\n");
@@ -322,6 +323,7 @@ void print_go_fish() {
     printf("><((('>     Incorrect Guess! Draw a card! Switching Turns!        ><((('>\n");
     printf("><((('>                                                           ><((('>\n");
     printf("><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('> ~~~ ><(((('>\n\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); // Clear screen
 }
 
 
